@@ -4,8 +4,8 @@
 
 const NCO_ALLOWED = [
   // ─── เพิ่ม/ลบ email ที่อนุญาตตรงนี้ ───
-  "poom@gmail.com",
-  "maprang@gmail.com",
+  "poomprofile@gmail.com",
+  "fernery11@gmail.com",
   // ใส่ email ทีม DSR ทั้งหมดตรงนี้
 ];
 

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nice Center Oil — Internal Tools</title>
+<script src="auth.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -190,7 +191,7 @@ body{font-family:'Barlow','Noto Sans Thai',sans-serif;background:var(--bg);color
   <div class="qbar">
     <span class="qlbl">เข้าถึงด่วน</span>
     <a class="ql" href="nice_center_oil_castrol_apr2569.html"><span class="qdot" style="background:var(--cg)"></span>ราคา Castrol เม.ย.69</a>
-    <a class="ql" href="#"><span class="qdot" style="background:var(--no)"></span>Commission Sim</a>
+    <a class="ql" href="commission.html"><span class="qdot" style="background:var(--no)"></span>Commission Sim</a>
     <a class="ql" href="#"><span class="qdot" style="background:#1E4D8C"></span>Route Planner</a>
     <a class="ql" href="#"><span class="qdot" style="background:#5B4A8A"></span>Attendance</a>
   </div>
@@ -226,13 +227,14 @@ body{font-family:'Barlow','Noto Sans Thai',sans-serif;background:var(--bg);color
     <div class="slabel">เครื่องมือ DSR</div>
     <div class="tgrid">
 
-      <div class="tcard soon" style="--c1:var(--no);--c2:#ff8c55;--cr3:232,98,42">
+      <a class="tcard" href="commission.html"
+         style="--c1:var(--no);--c2:#ff8c55;--cr3:232,98,42">
         <div class="ticon" style="background:rgba(232,98,42,.1)">💰</div>
         <div class="tname">Commission Simulator</div>
         <div class="tdesc">จำลองค่าคอมมิชชัน 4 หมวด DSR 5 คนพร้อมกัน รองรับ mobile Samsung Galaxy A05</div>
         <div class="ttags"><span class="ttag">Commission</span><span class="ttag">DSR</span><span class="ttag">Incentive</span></div>
-        <div class="tfoot"><span class="tupd">v8</span><span class="tsoon">เร็วๆ นี้</span></div>
-      </div>
+        <div class="tfoot"><span class="tupd">v8 · 2026</span><span class="tarr">→</span></div>
+      </a>
 
       <div class="tcard soon" style="--c1:var(--no);--c2:#ffaa55;--cr3:232,98,42">
         <div class="ticon" style="background:rgba(232,98,42,.1)">🗺️</div>
@@ -307,6 +309,9 @@ body{font-family:'Barlow','Noto Sans Thai',sans-serif;background:var(--bg);color
   <strong>หจก.ไนซ์เซ็นเตอร์ออยล์</strong> · ตัวแทนจำหน่ายผลิตภัณฑ์ Castrol<br>
   สุพรรณบุรี · สิงห์บุรี · อ่างทอง · ชัยนาท · อุทัยธานี · นครสวรรค์
 </div>
+<script>
+ncoGate({ title: "Internal Tools Portal", accentColor: "#00A850" });
+</script>
 
 </body>
 </html>

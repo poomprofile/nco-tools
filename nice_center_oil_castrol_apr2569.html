@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nice Center Oil — ราคาสินค้า Castrol เมษายน 2569</title>
+<script src="auth.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -596,8 +597,38 @@ th:nth-child(7) { width: 12%; }
 }
 .clear-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
 
-/* ─── FOOTER ─── */
-.footer {
+/* ─── MOBILE RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    padding: 12px 14px;
+    gap: 14px;
+  }
+  .cart-panel {
+    position: static;
+    order: 2;
+  }
+  .left-col { order: 1; }
+  .table-wrap { max-height: 55vh; }
+  th:nth-child(1), td:nth-child(1) { display: none; } /* hide code col */
+  th:nth-child(3), td:nth-child(3) { display: none; } /* hide cat badge */
+  th:nth-child(1) { width: 0 }
+  table { font-size: 12px; }
+  td { padding: 7px 9px; }
+  thead th { padding: 8px 9px; font-size: 11px; }
+  .prod-name { font-size: 12px; }
+  .prod-pack { font-size: 10px; }
+  td.num { font-size: 12px; }
+}
+@media (max-width: 600px) {
+  .header-inner { padding: 10px 14px; gap: 10px; }
+  .header-title { display: none; }
+  .logo-main { font-size: 15px; }
+  .filter-bar { padding: 10px 12px; gap: 8px; }
+  .tab-btn { padding: 5px 10px; font-size: 11px; }
+  .cart-items { max-height: 260px; }
+  th:nth-child(6), td:nth-child(6) { display: none; } /* hide tier col on very small */
+}
   max-width: 1400px;
   margin: 8px auto 24px;
   padding: 0 24px;
@@ -682,12 +713,6 @@ th:nth-child(7) { width: 12%; }
       <span class="cart-count-badge" id="cart-count">0</span>
     </div>
     <div class="cart-body">
-      <div class="global-disc-row">
-        <span class="global-disc-icon">🏷</span>
-        <span class="global-disc-label">ส่วนลด global (%)</span>
-        <input class="disc-input" type="number" id="global-disc" min="0" max="100" step="0.5" value="0" placeholder="0" oninput="renderCart()">
-        <span class="disc-pct">%</span>
-      </div>
 
       <div class="cart-items" id="cart-items">
         <div class="cart-empty">
@@ -719,6 +744,13 @@ th:nth-child(7) { width: 12%; }
           <span class="sum-label">รวมปริมาตร</span>
           <span class="sum-val" id="s-liters"></span>
         </div>
+      </div>
+
+      <div class="global-disc-row">
+        <span class="global-disc-icon">🏷</span>
+        <span class="global-disc-label">ส่วนลด global (%)</span>
+        <input class="disc-input" type="number" id="global-disc" min="0" max="100" step="0.5" value="0" placeholder="0" oninput="renderCart()">
+        <span class="disc-pct">%</span>
       </div>
 
       <button class="clear-btn" onclick="clearCart()" id="clear-btn" style="display:none">ล้างใบเสนอราคา</button>
@@ -1075,6 +1107,7 @@ function renderCart(){
 }
 
 renderSubBtns(); render(); renderCart();
+ncoGate({ title: "ราคาสินค้า Castrol", accentColor: "#007A3D" });
 </script>
 </body>
 </html>

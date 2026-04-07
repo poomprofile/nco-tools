@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nice Center Oil — Internal Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cg:#00A850;
+  --cr:#D22630;
+  --co:#E8622A;
+  --cs:#E8E8E8;
+  --cb:#1A1A1A;
+  --no:#E8622A;
+  --nc:#F5F0E8;
+  --nd:#1E1420;
+  --as:#C0C4CC;
+  --ink:#1E1420;
+  --ink-mid:#3d3545;
+  --ink-soft:#7a6e80;
+  --ink-faint:#b0a8b8;
+  --line:#e4dfe8;
+  --line-soft:#ede9f0;
+  --bg:#F7F5F9;
+  --white:#ffffff;
+  --r:16px;
+  --rs:10px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Barlow','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* HERO */
+.hero{background:var(--nd);position:relative;overflow:hidden;isolation:isolate}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orb 14s ease-in-out infinite}
+.o1{width:560px;height:560px;background:radial-gradient(circle,rgba(0,168,80,.32) 0%,transparent 70%);top:-140px;right:-60px;animation-delay:0s}
+.o2{width:420px;height:420px;background:radial-gradient(circle,rgba(232,98,42,.22) 0%,transparent 70%);bottom:-120px;left:8%;animation-delay:-6s}
+.o3{width:320px;height:320px;background:radial-gradient(circle,rgba(210,38,48,.18) 0%,transparent 70%);top:35%;right:28%;animation-delay:-10s}
+@keyframes orb{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(24px,-28px) scale(1.06)}66%{transform:translate(-18px,22px) scale(.94)}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:52px 52px;pointer-events:none}
+.hero-vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 100% at 50% 50%,transparent 25%,rgba(30,20,32,.65) 100%);pointer-events:none}
+
+.hero-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:60px 48px 52px}
+
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
+.logo-pill{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:40px;overflow:hidden;backdrop-filter:blur(14px)}
+.lp-g{background:var(--cg);padding:9px 18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:.8px;color:white;text-transform:uppercase}
+.lp-d{background:rgba(255,255,255,.07);padding:9px 18px;font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.3px}
+.badges{display:flex;gap:8px;align-items:center}
+.bdg{font-size:10px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:1.2px;text-transform:uppercase}
+.bdg-red{background:var(--cr);color:white}
+.bdg-audi{background:linear-gradient(135deg,#2a2a32,#18181e);border:1px solid rgba(192,196,204,.2);color:var(--as)}
+
+/* hero body */
+.hero-body{display:grid;grid-template-columns:1fr auto;gap:52px;align-items:end}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cg);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';width:28px;height:2px;background:var(--cg);display:inline-block}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;line-height:.92;color:white;margin-bottom:22px}
+.ht-1{font-size:22px;color:rgba(255,255,255,.3);letter-spacing:4px;display:block;margin-bottom:4px}
+.ht-2{font-size:80px;letter-spacing:-1px;display:block;color:var(--cg)}
+.ht-3{font-size:52px;letter-spacing:-0.5px;display:block;color:var(--no)}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.5);font-weight:300;line-height:1.75;max-width:460px;margin-bottom:28px}
+.provinces{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(255,255,255,.45);backdrop-filter:blur(8px);transition:all .2s;cursor:default}
+.pchip:hover{background:rgba(0,168,80,.14);border-color:rgba(0,168,80,.45);color:rgba(255,255,255,.85)}
+
+/* stats */
+.stats{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.scard{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:18px 24px;text-align:center;backdrop-filter:blur(16px);transition:all .2s;min-width:100px}
+.scard:hover{background:rgba(255,255,255,.09);border-color:rgba(0,168,80,.35)}
+.snum{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:36px;color:var(--cg);line-height:1}
+.snum.orange{color:var(--no)}
+.slbl{font-size:10px;color:rgba(255,255,255,.38);letter-spacing:1px;text-transform:uppercase;margin-top:5px}
+
+.accent-bar{height:3px;background:linear-gradient(90deg,var(--cr) 0%,var(--no) 32%,var(--cg) 68%,rgba(0,168,80,0) 100%)}
+
+/* CONTENT */
+.content{max-width:1280px;margin:0 auto;padding:44px 48px 72px}
+
+/* notice */
+.notice{background:linear-gradient(135deg,rgba(232,98,42,.07),rgba(245,240,232,.5));border:1px solid rgba(232,98,42,.2);border-radius:var(--rs);padding:13px 18px;font-size:13px;color:#7a3a18;display:flex;align-items:flex-start;gap:10px;margin-bottom:36px;line-height:1.6}
+
+/* quick bar */
+.qbar{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:14px 20px;margin-bottom:38px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 2px 16px rgba(30,20,32,.05)}
+.qlbl{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap;margin-right:4px}
+.ql{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13px;font-weight:500;color:var(--ink);padding:7px 14px;border:1px solid var(--line);border-radius:20px;background:var(--bg);transition:all .15s;white-space:nowrap}
+.ql:hover{border-color:var(--cg);color:var(--cg);background:rgba(0,168,80,.05)}
+.qdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* section */
+.section{margin-bottom:44px}
+.slabel{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* grid */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+
+/* card */
+.tcard{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:26px;cursor:pointer;text-decoration:none;color:inherit;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s,border-color .2s}
+.tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c1,var(--cg)),var(--c2,var(--cg)),transparent);opacity:0;transition:opacity .2s}
+.tcard::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% -10%,rgba(var(--cr3,0,168,80),.07) 0%,transparent 70%);opacity:0;transition:opacity .25s;pointer-events:none}
+.tcard:hover{box-shadow:0 12px 40px rgba(var(--cr3,0,168,80),.13),0 2px 8px rgba(30,20,32,.06);transform:translateY(-3px);border-color:rgba(var(--cr3,0,168,80),.28)}
+.tcard:hover::before,.tcard:hover::after{opacity:1}
+.tcard.live::before{opacity:.5}
+.new-tag{position:absolute;top:16px;right:16px;background:var(--cr);color:white;font-size:9px;font-weight:700;letter-spacing:1.5px;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+.tcard.soon{opacity:.48;cursor:default;pointer-events:none;filter:grayscale(.25)}
+
+.ticon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;flex-shrink:0}
+.tname{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.25}
+.tdesc{font-size:13px;color:var(--ink-soft);line-height:1.65;flex:1;margin-bottom:18px}
+.ttags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px}
+.ttag{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;color:var(--ink-faint);background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.tfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line-soft);padding-top:14px;margin-top:auto}
+.tupd{font-size:11px;color:var(--ink-faint)}
+.tarr{width:32px;height:32px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink-soft);transition:all .15s;flex-shrink:0}
+.tcard:hover .tarr{background:rgba(var(--cr3,0,168,80),1);border-color:transparent;color:white}
+.tsoon{font-size:10px;color:var(--ink-faint);border:1px solid var(--line);border-radius:4px;padding:3px 8px}
+
+/* footer */
+.footer{background:var(--nd);color:rgba(255,255,255,.33);text-align:center;padding:28px;font-size:12px;line-height:1.8;position:relative;overflow:hidden}
+.footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cr),var(--no),var(--cg))}
+.footer strong{color:rgba(255,255,255,.62)}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--cg)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-vig"></div>
+  <div class="hero-inner">
+
+    <div class="topbar">
+      <div class="logo-pill">
+        <div class="lp-g">Nice<span style="opacity:.75">Center</span>Oil</div>
+        <div class="lp-d">Castrol Distributor</div>
+      </div>
+      <div class="badges">
+        <span class="bdg bdg-red">Castrol</span>
+        <span class="bdg bdg-audi">Audi Sport</span>
+      </div>
+    </div>
+
+    <div class="hero-body">
+      <div>
+        <div class="eyebrow">Internal Tools Portal</div>
+        <div class="hero-title">
+          <span class="ht-1">NCO</span>
+          <span class="ht-2">TOOLS</span>
+          <span class="ht-3">เครื่องมือภายใน</span>
+        </div>
+        <div class="hero-sub">ระบบเครื่องมือสำหรับทีม DSR และฝ่ายปฏิบัติการ<br>ราคาสินค้า · คอมมิชชัน · Route Planning · HR</div>
+        <div class="provinces">
+          <span class="pchip">สุพรรณบุรี</span>
+          <span class="pchip">สิงห์บุรี</span>
+          <span class="pchip">อ่างทอง</span>
+          <span class="pchip">ชัยนาท</span>
+          <span class="pchip">อุทัยธานี</span>
+          <span class="pchip">นครสวรรค์</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="scard"><div class="snum">6</div><div class="slbl">จังหวัด</div></div>
+        <div class="scard"><div class="snum">5</div><div class="slbl">DSR</div></div>
+        <div class="scard"><div class="snum orange">100<span style="font-size:22px">+</span></div><div class="slbl">Outlets</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="content">
+
+  <div class="notice">
+    <span style="flex-shrink:0;font-size:15px;margin-top:1px">💡</span>
+    <span>Bookmark หน้านี้หรือบันทึกลิงก์ใน LINE เพื่อเข้าถึงทุก tool ได้รวดเร็ว · อัปเดตล่าสุด <strong>เมษายน 2569</strong></span>
+  </div>
+
+  <div class="qbar">
+    <span class="qlbl">เข้าถึงด่วน</span>
+    <a class="ql" href="nice_center_oil_castrol_apr2569.html"><span class="qdot" style="background:var(--cg)"></span>ราคา Castrol เม.ย.69</a>
+    <a class="ql" href="#"><span class="qdot" style="background:var(--no)"></span>Commission Sim</a>
+    <a class="ql" href="#"><span class="qdot" style="background:#1E4D8C"></span>Route Planner</a>
+    <a class="ql" href="#"><span class="qdot" style="background:#5B4A8A"></span>Attendance</a>
+  </div>
+
+  <!-- ราคา -->
+  <div class="section">
+    <div class="slabel">ราคา &amp; ใบเสนอราคา</div>
+    <div class="tgrid">
+
+      <a class="tcard live" href="nice_center_oil_castrol_apr2569.html"
+         style="--c1:var(--cg);--c2:#00e06a;--cr3:0,168,80">
+        <span class="new-tag">New</span>
+        <div class="ticon" style="background:rgba(0,168,80,.1)">🛢️</div>
+        <div class="tname">ราคาสินค้า Castrol เมษายน 2569</div>
+        <div class="tdesc">ค้นหาสินค้า คำนวณส่วนลด global / ต่อรายการ สรุปใบเสนอราคา รวมลิตรทั้งหมด</div>
+        <div class="ttags"><span class="ttag">PCO</span><span class="ttag">MCO</span><span class="ttag">Full Syn</span><span class="ttag">Part Syn</span><span class="ttag">ส่วนลด</span></div>
+        <div class="tfoot"><span class="tupd">อัปเดต เม.ย. 2569</span><span class="tarr">→</span></div>
+      </a>
+
+      <div class="tcard soon" style="--c1:var(--cg);--cr3:0,168,80">
+        <div class="ticon" style="background:rgba(0,168,80,.07)">📄</div>
+        <div class="tname">ราคาสินค้า พฤษภาคม 2569</div>
+        <div class="tdesc">จะอัปเดตเมื่อได้รับ price list จาก Castrol</div>
+        <div class="ttags"><span class="ttag">PCO</span><span class="ttag">MCO</span></div>
+        <div class="tfoot"><span class="tupd">รอข้อมูล</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DSR -->
+  <div class="section">
+    <div class="slabel">เครื่องมือ DSR</div>
+    <div class="tgrid">
+
+      <div class="tcard soon" style="--c1:var(--no);--c2:#ff8c55;--cr3:232,98,42">
+        <div class="ticon" style="background:rgba(232,98,42,.1)">💰</div>
+        <div class="tname">Commission Simulator</div>
+        <div class="tdesc">จำลองค่าคอมมิชชัน 4 หมวด DSR 5 คนพร้อมกัน รองรับ mobile Samsung Galaxy A05</div>
+        <div class="ttags"><span class="ttag">Commission</span><span class="ttag">DSR</span><span class="ttag">Incentive</span></div>
+        <div class="tfoot"><span class="tupd">v8</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+      <div class="tcard soon" style="--c1:var(--no);--c2:#ffaa55;--cr3:232,98,42">
+        <div class="ticon" style="background:rgba(232,98,42,.1)">🗺️</div>
+        <div class="tname">Route Planner</div>
+        <div class="tdesc">วางแผนเส้นทางส่ง 2 คัน Drag-and-drop ออเดอร์ ติดตาม capacity realtime</div>
+        <div class="ttags"><span class="ttag">Delivery</span><span class="ttag">Kanban</span><span class="ttag">2 Trucks</span></div>
+        <div class="tfoot"><span class="tupd">—</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+      <div class="tcard soon" style="--c1:#3a70d0;--c2:#60a0ff;--cr3:30,77,140">
+        <div class="ticon" style="background:rgba(30,77,140,.1)">📊</div>
+        <div class="tname">DSR Health Report</div>
+        <div class="tdesc">Dashboard ผลงาน DSR รายสัปดาห์ 6 แท็บ — Dashboard · Route · Wholesale · Alerts · Check-in · Action Plan</div>
+        <div class="ttags"><span class="ttag">Dashboard</span><span class="ttag">KPI</span><span class="ttag">Castrol</span></div>
+        <div class="tfoot"><span class="tupd">Google Apps Script</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Operations -->
+  <div class="section">
+    <div class="slabel">Operations</div>
+    <div class="tgrid">
+
+      <div class="tcard soon" style="--c1:#8060c0;--c2:#b090f0;--cr3:91,74,138">
+        <div class="ticon" style="background:rgba(91,74,138,.1)">🕐</div>
+        <div class="tname">Attendance Dashboard</div>
+        <div class="tdesc">ติดตาม check-in พนักงาน 4 คน จาก fingerprint scanner ร้านยนต์ประกิจ อู่ทอง</div>
+        <div class="ttags"><span class="ttag">HR</span><span class="ttag">Attendance</span><span class="ttag">ร้านยนต์ประกิจ</span></div>
+        <div class="tfoot"><span class="tupd">HTML + SheetJS</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+      <div class="tcard soon" style="--c1:#8060c0;--c2:#b090f0;--cr3:91,74,138">
+        <div class="ticon" style="background:rgba(91,74,138,.1)">⛽</div>
+        <div class="tname">Mileage &amp; Fuel Tracker</div>
+        <div class="tdesc">บันทึกระยะทางและค่าน้ำมัน DSR สแกนสลิปอัตโนมัติด้วย Google Cloud Vision OCR</div>
+        <div class="ttags"><span class="ttag">OCR</span><span class="ttag">Reimbursement</span><span class="ttag">Apps Script</span></div>
+        <div class="tfoot"><span class="tupd">—</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+      <div class="tcard soon" style="--c1:var(--cg);--c2:#00d46a;--cr3:0,168,80">
+        <div class="ticon" style="background:rgba(0,168,80,.08)">🔧</div>
+        <div class="tname">Car Service Orders</div>
+        <div class="tdesc">ระบบจัดการใบสั่งซ่อมแทน Excel workflow ดีไซน์ Castrol × Audi F1 2026</div>
+        <div class="ttags"><span class="ttag">Service</span><span class="ttag">Orders</span><span class="ttag">Audi F1</span></div>
+        <div class="tfoot"><span class="tupd">—</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tire Shop -->
+  <div class="section">
+    <div class="slabel">ร้านยนต์ประกิจ</div>
+    <div class="tgrid">
+
+      <div class="tcard soon" style="--c1:var(--cr);--c2:#ff4444;--cr3:210,38,48">
+        <div class="ticon" style="background:rgba(210,38,48,.08)">📋</div>
+        <div class="tname">ราคายาง Camel &amp; Cheetah</div>
+        <div class="tdesc">รายการราคายาง PDF แบบ multi-page รองรับฟอนต์ภาษาไทย เรียงขนาดยาง</div>
+        <div class="ttags"><span class="ttag">Camel</span><span class="ttag">Cheetah</span><span class="ttag">PDF</span></div>
+        <div class="tfoot"><span class="tupd">—</span><span class="tsoon">เร็วๆ นี้</span></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <strong>หจก.ไนซ์เซ็นเตอร์ออยล์</strong> · ตัวแทนจำหน่ายผลิตภัณฑ์ Castrol<br>
+  สุพรรณบุรี · สิงห์บุรี · อ่างทอง · ชัยนาท · อุทัยธานี · นครสวรรค์
+</div>
+
+</body>
+</html>

@@ -21,7 +21,6 @@
   --red-light: #fff0f1;
   --gold: #C9A84C;
   --gold-light: #fdf7e8;
-
   --ink: #18201c;
   --ink-mid: #3a4440;
   --ink-soft: #68736e;
@@ -413,7 +412,7 @@ td.code {
 .b-min { background: #f2f4f3; color: #4a5550; border: 1px solid #d0d8d4; }
 
 .add-btn {
-  padding: 5px 12px;
+  padding: 5px 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   font-size: 11px;
@@ -424,19 +423,25 @@ td.code {
   transition: all 0.15s;
   white-space: nowrap;
   font-weight: 500;
+  width: 100%;
+  display: block;
+  text-align: center;
+  box-sizing: border-box;
 }
 .add-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
 .add-btn.in-cart { background: var(--theme-light); border-color: var(--theme); color: var(--theme-dark); }
 .no-data { text-align: center; padding: 3rem; color: var(--ink-faint); font-size: 13px; }
 
 /* col widths */
-th:nth-child(1) { width: 9%; }
-th:nth-child(2) { width: 34%; }
+th:nth-child(1) { width: 10%; }
+th:nth-child(2) { width: 33%; }
 th:nth-child(3) { width: 8%; }
 th:nth-child(4) { width: 14%; }
 th:nth-child(5) { width: 13%; }
 th:nth-child(6) { width: 10%; }
 th:nth-child(7) { width: 12%; }
+/* allow header to wrap instead of overflow */
+thead th { white-space: normal !important; line-height: 1.35; vertical-align: bottom; }
 
 /* ─── CART PANEL ─── */
 .cart-panel {
@@ -597,6 +602,47 @@ th:nth-child(7) { width: 12%; }
 }
 .clear-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
 
+/* ─── CUSTOMER TYPE TOGGLE ─── */
+.ctype-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ctype-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ctype-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  background: white;
+  color: var(--ink-soft);
+  transition: all 0.15s;
+  text-align: center;
+}
+.ctype-btn:hover { border-color: var(--theme); color: var(--theme); }
+.ctype-btn.active-credit {
+  background: var(--theme-light);
+  border-color: var(--theme);
+  color: var(--theme-dark);
+  font-weight: 600;
+}
+.ctype-btn.active-cash {
+  background: var(--gold-light);
+  border-color: var(--gold);
+  color: #7a5800;
+  font-weight: 600;
+}
+
 /* ─── MOBILE RESPONSIVE ─── */
 @media (max-width: 900px) {
   .page {
@@ -604,21 +650,24 @@ th:nth-child(7) { width: 12%; }
     padding: 12px 14px;
     gap: 14px;
   }
-  .cart-panel {
-    position: static;
-    order: 2;
-  }
+  .cart-panel { position: static; order: 2; }
   .left-col { order: 1; }
   .table-wrap { max-height: 55vh; }
-  th:nth-child(1), td:nth-child(1) { display: none; } /* hide code col */
-  th:nth-child(3), td:nth-child(3) { display: none; } /* hide cat badge */
-  th:nth-child(1) { width: 0 }
+  th:nth-child(1), td:nth-child(1) { display: none; }
+  th:nth-child(3), td:nth-child(3) { display: none; }
+  /* redistribute widths after hidden cols */
+  th:nth-child(2) { width: 42%; }
+  th:nth-child(4) { width: 18%; }
+  th:nth-child(5) { width: 16%; }
+  th:nth-child(6) { width: 12%; }
+  th:nth-child(7) { width: 12%; }
   table { font-size: 12px; }
-  td { padding: 7px 9px; }
-  thead th { padding: 8px 9px; font-size: 11px; }
+  td { padding: 7px 8px; }
+  thead th { padding: 7px 8px; font-size: 10px; }
   .prod-name { font-size: 12px; }
   .prod-pack { font-size: 10px; }
   td.num { font-size: 12px; }
+  .add-btn { font-size: 10px; padding: 4px 4px; }
 }
 @media (max-width: 600px) {
   .header-inner { padding: 10px 14px; gap: 10px; }
@@ -627,9 +676,17 @@ th:nth-child(7) { width: 12%; }
   .filter-bar { padding: 10px 12px; gap: 8px; }
   .tab-btn { padding: 5px 10px; font-size: 11px; }
   .cart-items { max-height: 260px; }
-  th:nth-child(6), td:nth-child(6) { display: none; } /* hide tier col on very small */
+  th:nth-child(6), td:nth-child(6) { display: none; }
+  /* 3 visible cols: name, price/box, price/unit, add */
+  th:nth-child(2) { width: 48%; }
+  th:nth-child(4) { width: 20%; }
+  th:nth-child(5) { width: 18%; }
+  th:nth-child(7) { width: 14%; }
 }
-  max-width: 1400px;
+
+/* ─── FOOTER ─── */
+.footer {
+  max-width: 1600px;
   margin: 8px auto 24px;
   padding: 0 24px;
   text-align: center;
@@ -730,6 +787,10 @@ th:nth-child(7) { width: 12%; }
           <span class="sum-label">ส่วนลดรวม</span>
           <span class="sum-save-val" id="s-disc"></span>
         </div>
+        <div class="sum-row" id="s-cash-row" style="display:none">
+          <span class="sum-label" style="color:var(--gold)">💵 เงินสด −1%</span>
+          <span class="sum-save-val" id="s-cash-amt"></span>
+        </div>
         <hr class="sum-divider">
         <div class="sum-row">
           <span class="sum-total-label">ยอดสุทธิ</span>
@@ -751,6 +812,16 @@ th:nth-child(7) { width: 12%; }
         <span class="global-disc-label">ส่วนลด global (%)</span>
         <input class="disc-input" type="number" id="global-disc" min="0" max="100" step="0.5" value="0" placeholder="0" oninput="renderCart()">
         <span class="disc-pct">%</span>
+      </div>
+
+      <div class="ctype-row">
+        <span class="ctype-label">ลูกค้า</span>
+        <button class="ctype-btn active-credit" id="btn-credit" onclick="setCtype('credit')">
+          💳 เครดิต
+        </button>
+        <button class="ctype-btn" id="btn-cash" onclick="setCtype('cash')">
+          💵 เงินสด −1%
+        </button>
       </div>
 
       <button class="clear-btn" onclick="clearCart()" id="clear-btn" style="display:none">ล้างใบเสนอราคา</button>
@@ -887,7 +958,14 @@ const SUB_LABELS={
   COOLANT:'น้ำยาหล่อเย็น',GREASE:'จารบี',HYDRAULIC:'ไฮดรอลิค',OTHERS:'อื่นๆ'
 };
 
-let tab='ALL', sub=null, tierFilter=new Set();
+let tab='ALL', sub=null, tierFilter=new Set(), ctype='credit';
+
+function setCtype(t) {
+  ctype = t;
+  document.getElementById('btn-credit').className = 'ctype-btn' + (t==='credit' ? ' active-credit' : '');
+  document.getElementById('btn-cash').className   = 'ctype-btn' + (t==='cash'   ? ' active-cash'   : '');
+  renderCart();
+}
 
 /* normalise viscosity query: 10W30, 10W-30, 1030 → "10w30" */
 function normVis(s){
@@ -974,11 +1052,18 @@ function clearCart(){cart={}; render(); renderCart();}
 
 function getDisc(code){
   const g=parseFloat(document.getElementById('global-disc').value)||0;
+  let base;
   if(cart[code]){
     const ov=cart[code].override;
-    if(ov!==''&&ov!==null){const n=parseFloat(ov);if(!isNaN(n))return Math.min(100,Math.max(0,n));}
+    if(ov!==''&&ov!==null){const n=parseFloat(ov);if(!isNaN(n)){base=Math.min(100,Math.max(0,n));}}
   }
-  return Math.min(100,Math.max(0,g));
+  if(base===undefined) base=Math.min(100,Math.max(0,g));
+  // เงินสด: compound discount — (1 - base/100) × (1 - 0.01) แปลงกลับเป็น %
+  if(ctype==='cash'){
+    const combined=100*(1-(1-base/100)*0.99);
+    return Math.min(100,combined);
+  }
+  return base;
 }
 
 function render(){
@@ -1104,6 +1189,16 @@ function renderCart(){
   document.getElementById('s-total').textContent=fmt(totalAfter)+' บ.';
   document.getElementById('s-units').textContent=totalUnits+' ลัง';
   document.getElementById('s-liters').textContent=fmtL(totalLiters)+' ลิตร';
+  // cash row
+  const cashRow=document.getElementById('s-cash-row');
+  const cashAmt=document.getElementById('s-cash-amt');
+  if(ctype==='cash'){
+    const cashSaving=Math.round(totalAfter/0.99*0.01); // 1% ของราคาก่อนหักเงินสด
+    cashRow.style.display='flex';
+    cashAmt.textContent='−'+fmt(cashSaving)+' บ.';
+  } else {
+    cashRow.style.display='none';
+  }
 }
 
 renderSubBtns(); render(); renderCart();

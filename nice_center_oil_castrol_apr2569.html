@@ -1202,6 +1202,15 @@ function removeDiscRule(id) {
 function updateDiscRule(id, field, val) {
   const r = discRules.find(r => r.id === id);
   if (r) r[field] = field === 'pct' ? (parseFloat(val) || 0) : val;
+  // name/scope change — safe to rebuild (not triggered while typing numbers)
+  if (field !== 'pct') renderDiscRules();
+  renderCart();
+}
+
+// pct-only update — just saves value + re-renders cart prices, no DOM rebuild
+function updateDiscRulePct(id, val) {
+  const r = discRules.find(r => r.id === id);
+  if (r) r.pct = val;
   renderCart();
 }
 
@@ -1224,9 +1233,9 @@ function renderDiscRules() {
         onchange="updateDiscRule(${r.id},'name',this.value)"
         placeholder="ชื่อส่วนลด">
       <div class="disc-rule-pct-wrap">
-        <input class="disc-rule-pct" type="number" min="0" max="100" step="0.5"
+        <input class="disc-rule-pct" type="text" inputmode="decimal"
           value="${r.pct || ''}" placeholder="0"
-          oninput="updateDiscRule(${r.id},'pct',this.value)">
+          onblur="var v=parseFloat(this.value.replace(/[^0-9.]/g,''))||0;if(v>100)v=100;this.value=v||'';updateDiscRulePct(${r.id},v)">
         <span class="disc-rule-pct-sfx">%</span>
       </div>
       <select class="disc-scope-select" onchange="updateDiscRule(${r.id},'scope',this.value)">${opts}</select>
@@ -1466,9 +1475,9 @@ function renderCart(){
         <div style="margin-left:6px;font-size:11px;color:var(--ink-soft);font-weight:500">${fmtL(litersTotal)} ล.</div>
         <div class="override-wrap" style="margin-left:auto">
           <span class="ci-ctrl-label">Override %</span>
-          <input class="override-input" type="number" min="0" max="100" step="0.5"
+          <input class="override-input" type="text" inputmode="decimal"
             placeholder="—" value="${ov}"
-            oninput="setOverride('${p.code}',this.value)"
+            onblur="var v=this.value.replace(/[^0-9.]/g,'');if(parseFloat(v)>100)v='100';this.value=v;setOverride('${p.code}',v)"
             title="กำหนด % เองสำหรับสินค้านี้ ทับ rule ทุกอัน">
         </div>
       </div>

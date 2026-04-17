@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Nice Center Oil — ราคาสินค้า Castrol เมษายน 2569</title>
 <script src="auth.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -214,7 +214,7 @@ body {
   padding: 12px 40px 12px 40px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 16px;
   font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
   background: var(--bg);
   color: var(--ink);
@@ -339,13 +339,13 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: 14px;
   table-layout: fixed;
 }
 thead th {
   background: var(--theme-dark);
   color: rgba(255,255,255,0.85);
-  padding: 11px 14px;
+  padding: 12px 14px;
   text-align: left;
   font-weight: 500;
   font-size: 12px;
@@ -363,15 +363,15 @@ tbody tr { border-bottom: 1px solid var(--line-soft); transition: background 0.1
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: var(--theme-pale); }
 td {
-  padding: 10px 14px;
+  padding: 11px 14px;
   vertical-align: middle;
   color: var(--ink);
 }
 td.num {
   text-align: right;
   font-family: 'Barlow', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "zero" 0, "tnum" 1;
   color: var(--ink-mid);
@@ -385,14 +385,14 @@ td.code {
 .section-row td {
   background: var(--theme-light);
   color: var(--theme-dark);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   padding: 6px 14px;
   letter-spacing: 0.3px;
   border-bottom: 1px solid rgba(var(--theme-rgb),0.12);
 }
-.prod-name { font-size: 13.5px; font-weight: 500; color: var(--ink); line-height: 1.3; }
-.prod-pack { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+.prod-name { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+.prod-pack { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
 
 /* badges */
 .badge {
@@ -554,7 +554,7 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
 .override-input {
   width: 48px; padding: 3px 6px;
   border: 1px solid var(--line);
-  border-radius: 5px; font-size: 12px;
+  border-radius: 5px; font-size: 16px;
   font-family: 'Barlow', sans-serif;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -602,7 +602,173 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
 }
 .clear-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
 
-/* ─── CUSTOMER TYPE TOGGLE ─── */
+/* ─── QTY INPUT CONTROL ─── */
+.qty-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.qty-btn {
+  width: 26px; height: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+  transition: all 0.1s;
+  flex-shrink: 0;
+}
+.qty-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
+.qty-input {
+  width: 52px; height: 32px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 0;
+  text-align: center;
+  background: white;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.qty-input:focus { border-color: var(--theme); }
+
+/* ─── DISCOUNT RULES PANEL ─── */
+.disc-rules-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.disc-rules-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.disc-rules-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.disc-add-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--theme);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
+  font-weight: 600;
+  color: var(--theme);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.disc-add-btn:hover { background: var(--theme); color: white; }
+.disc-rule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  background: white;
+  flex-wrap: wrap;
+}
+.disc-rule:last-child { border-bottom: none; }
+.disc-rule-name {
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 4px 7px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
+  outline: none;
+  width: 90px;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+.disc-rule-name:focus { border-color: var(--theme); }
+.disc-rule-pct {
+  width: 56px; height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 0;
+  text-align: right;
+  background: white;
+  color: var(--ink);
+  outline: none;
+  padding: 4px 22px 4px 6px;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+  flex-shrink: 0;
+}
+.disc-rule-pct::-webkit-inner-spin-button,
+.disc-rule-pct::-webkit-outer-spin-button { -webkit-appearance: none; }
+.disc-rule-pct:focus { border-color: var(--theme); }
+.disc-rule-pct-wrap { position: relative; flex-shrink: 0; }
+.disc-rule-pct-sfx {
+  position: absolute; right: 6px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px; color: var(--ink-faint);
+  pointer-events: none;
+}
+.disc-scope-select {
+  flex: 1;
+  min-width: 80px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 0 6px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.disc-scope-select:focus { border-color: var(--theme); }
+.disc-del-btn {
+  width: 24px; height: 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.1s;
+  flex-shrink: 0;
+}
+.disc-del-btn:hover { background: var(--red-light); color: var(--red); }
+.disc-rule-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.disc-rule-tag-all { background: var(--theme-light); color: var(--theme-dark); }
+.disc-rule-tag-scope { background: var(--gold-light); color: #7a5800; }
 .ctype-row {
   display: flex;
   gap: 6px;
@@ -649,10 +815,15 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
     grid-template-columns: 1fr;
     padding: 12px 14px;
     gap: 14px;
+    /* ป้องกัน horizontal scroll จากตาราง */
+    overflow-x: hidden;
+    touch-action: pan-y;
   }
   .cart-panel { position: static; order: 2; }
-  .left-col { order: 1; }
-  .table-wrap { max-height: 55vh; }
+  .left-col { order: 1; overflow: hidden; }
+  /* ตาราง scroll ในกรอบได้ แต่ไม่ขยายออกนอกหน้า */
+  .table-card { overflow: hidden; }
+  .table-wrap { max-height: 55vh; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   th:nth-child(1), td:nth-child(1) { display: none; }
   th:nth-child(3), td:nth-child(3) { display: none; }
   /* redistribute widths after hidden cols */
@@ -668,6 +839,8 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
   .prod-pack { font-size: 10px; }
   td.num { font-size: 12px; }
   .add-btn { font-size: 10px; padding: 4px 4px; }
+  /* qty btn match taller input */
+  .qty-btn { width: 32px; height: 32px; }
 }
 @media (max-width: 600px) {
   .header-inner { padding: 10px 14px; gap: 10px; }
@@ -807,21 +980,20 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
         </div>
       </div>
 
-      <div class="global-disc-row">
-        <span class="global-disc-icon">🏷</span>
-        <span class="global-disc-label">ส่วนลด global (%)</span>
-        <input class="disc-input" type="number" id="global-disc" min="0" max="100" step="0.5" value="0" placeholder="0" oninput="renderCart()">
-        <span class="disc-pct">%</span>
+      <div class="global-disc-row" style="display:none"><input id="global-disc" value="0"></div>
+
+      <div class="disc-rules-panel">
+        <div class="disc-rules-header">
+          <span class="disc-rules-title">ส่วนลด</span>
+          <button class="disc-add-btn" onclick="addDiscRule()">+ เพิ่มส่วนลด</button>
+        </div>
+        <div id="disc-rules-list"></div>
       </div>
 
       <div class="ctype-row">
         <span class="ctype-label">ลูกค้า</span>
-        <button class="ctype-btn active-credit" id="btn-credit" onclick="setCtype('credit')">
-          💳 เครดิต
-        </button>
-        <button class="ctype-btn" id="btn-cash" onclick="setCtype('cash')">
-          💵 เงินสด −1%
-        </button>
+        <button class="ctype-btn active-credit" id="btn-credit" onclick="setCtype('credit')">💳 เครดิต</button>
+        <button class="ctype-btn" id="btn-cash" onclick="setCtype('cash')">💵 เงินสด −1%</button>
       </div>
 
       <button class="clear-btn" onclick="clearCart()" id="clear-btn" style="display:none">ล้างใบเสนอราคา</button>
@@ -960,11 +1132,107 @@ const SUB_LABELS={
 
 let tab='ALL', sub=null, tierFilter=new Set(), ctype='credit';
 
-function setCtype(t) {
-  ctype = t;
-  document.getElementById('btn-credit').className = 'ctype-btn' + (t==='credit' ? ' active-credit' : '');
-  document.getElementById('btn-cash').className   = 'ctype-btn' + (t==='cash'   ? ' active-cash'   : '');
+/* ── DISCOUNT RULES ─────────────────────────────────────────────
+   Each rule: { id, name, pct, scope }
+   scope: 'ALL' | 'MCO' | 'PCO' | 'OTHER' | 'POWER1' | 'ACTIV' |
+          'EDGE' | 'MAGNATEC' | 'GTX' | 'VISCO' | 'FS' | 'PS' | 'MIN'
+   Calculation: compound — (1−r1/100)×(1−r2/100)×... applied to all matching rules
+*/
+const SCOPE_OPTIONS = [
+  { v:'ALL',     label:'ทุกสินค้า' },
+  { v:'PCO',     label:'PCO — รถยนต์' },
+  { v:'MCO',     label:'MCO — มอเตอร์ไซค์' },
+  { v:'OTHER',   label:'เกียร์ / อื่นๆ' },
+  { v:'EDGE',    label:'Brand: Edge' },
+  { v:'MAGNATEC',label:'Brand: Magnatec' },
+  { v:'GTX',     label:'Brand: GTX' },
+  { v:'VISCO',   label:'Brand: Visco 3000' },
+  { v:'POWER1',  label:'Brand: Power1' },
+  { v:'ACTIV',   label:'Brand: Activ' },
+  { v:'GO2T',    label:'Brand: Go! 2T' },
+];
+
+let discRules = [
+  { id: 1, name: 'Global', pct: 0, scope: 'ALL' }
+];
+let discRuleIdSeq = 2;
+
+function ruleMatches(rule, prod) {
+  const s = rule.scope;
+  if (s === 'ALL') return true;
+  if (s === 'MCO' || s === 'PCO' || s === 'OTHER') return prod.cat === s;
+  return prod.sub === s; // brand
+}
+
+function getDisc(code) {
+  const prod = PRODUCTS.find(x => x.code === code);
+  if (!prod) return 0;
+  // Per-item override: replace all rules
+  if (cart[code]) {
+    const ov = cart[code].override;
+    if (ov !== '' && ov !== null) {
+      const n = parseFloat(ov);
+      if (!isNaN(n)) {
+        const base = Math.min(100, Math.max(0, n));
+        return ctype === 'cash' ? Math.min(100, base + 1) : base;
+      }
+    }
+  }
+  // Simple sum of all matching rules
+  let total = discRules.reduce((sum, r) => {
+    const pct = parseFloat(r.pct) || 0;
+    return sum + (ruleMatches(r, prod) ? pct : 0);
+  }, 0);
+  if (ctype === 'cash') total += 1;
+  return Math.min(100, total);
+}
+
+function addDiscRule() {
+  discRules.push({ id: discRuleIdSeq++, name: 'ส่วนลด', pct: 0, scope: 'ALL' });
+  renderDiscRules();
   renderCart();
+}
+
+function removeDiscRule(id) {
+  discRules = discRules.filter(r => r.id !== id);
+  renderDiscRules();
+  renderCart();
+}
+
+function updateDiscRule(id, field, val) {
+  const r = discRules.find(r => r.id === id);
+  if (r) r[field] = field === 'pct' ? (parseFloat(val) || 0) : val;
+  renderCart();
+}
+
+function renderDiscRules() {
+  const list = document.getElementById('disc-rules-list');
+  if (!list) return;
+  if (!discRules.length) {
+    list.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--ink-faint);text-align:center">ยังไม่มีส่วนลด</div>';
+    return;
+  }
+  list.innerHTML = discRules.map(r => {
+    const isAll = r.scope === 'ALL';
+    const tagCls = isAll ? 'disc-rule-tag disc-rule-tag-all' : 'disc-rule-tag disc-rule-tag-scope';
+    const tagTxt = isAll ? 'ทุกสินค้า' : (SCOPE_OPTIONS.find(o => o.v === r.scope)?.label || r.scope);
+    const opts = SCOPE_OPTIONS.map(o =>
+      `<option value="${o.v}"${o.v === r.scope ? ' selected' : ''}>${o.label}</option>`
+    ).join('');
+    return `<div class="disc-rule">
+      <input class="disc-rule-name" type="text" value="${r.name}"
+        onchange="updateDiscRule(${r.id},'name',this.value)"
+        placeholder="ชื่อส่วนลด">
+      <div class="disc-rule-pct-wrap">
+        <input class="disc-rule-pct" type="number" min="0" max="100" step="0.5"
+          value="${r.pct || ''}" placeholder="0"
+          oninput="updateDiscRule(${r.id},'pct',this.value)">
+        <span class="disc-rule-pct-sfx">%</span>
+      </div>
+      <select class="disc-scope-select" onchange="updateDiscRule(${r.id},'scope',this.value)">${opts}</select>
+      <button class="disc-del-btn" onclick="removeDiscRule(${r.id})">×</button>
+    </div>`;
+  }).join('');
 }
 
 /* normalise viscosity query: 10W30, 10W-30, 1030 → "10w30" */
@@ -1042,11 +1310,30 @@ function addToCart(code){
   render(); renderCart();
 }
 function removeFromCart(code){delete cart[code]; render(); renderCart();}
-function changeQty(code,delta){
-  if(!cart[code])return;
-  cart[code].qty=Math.max(1,cart[code].qty+delta);
+function setCtype(t) {
+  ctype = t;
+  document.getElementById('btn-credit').className = 'ctype-btn' + (t==='credit' ? ' active-credit' : '');
+  document.getElementById('btn-cash').className   = 'ctype-btn' + (t==='cash'   ? ' active-cash'   : '');
   renderCart();
 }
+
+function changeQty(code, delta) {
+  if (!cart[code]) return;
+  cart[code].qty = Math.max(1, cart[code].qty + delta);
+  // sync input without re-render to avoid losing focus
+  const inp = document.getElementById('qi_' + code);
+  if (inp && document.activeElement !== inp) inp.value = cart[code].qty;
+  renderCartSummary();
+}
+
+function setQtyInput(code, val) {
+  if (!cart[code]) return;
+  const n = parseInt(val);
+  cart[code].qty = isNaN(n) || n < 1 ? 1 : n;
+  renderCartSummary();
+}
+
+/* ─── RENDER CART (full rebuild — called on add/remove/discount change) ─── */
 function setOverride(code,val){if(cart[code])cart[code].override=val; renderCart();}
 function clearCart(){cart={}; render(); renderCart();}
 
@@ -1123,6 +1410,7 @@ function renderCart(){
   const cartEl=document.getElementById('cart-items');
   const summaryEl=document.getElementById('summary-box');
   const clearEl=document.getElementById('clear-btn');
+  renderDiscRules();
   if(!items.length){
     cartEl.innerHTML='<div class="cart-empty"><span class="cart-empty-icon">🛒</span>ยังไม่มีสินค้าในใบเสนอ<br>กด <strong>+ เพิ่ม</strong> จากรายการซ้าย</div>';
     summaryEl.style.display='none'; clearEl.style.display='none'; return;
@@ -1138,12 +1426,26 @@ function renderCart(){
     const after=before-saved;
     const perBoxAfter=after/qty;
     const perUnitAfter=Math.round(perBoxAfter/p.packNum);
-    /* liters: packNum × size × qty */
-    const litersPerBox=p.packNum * (p.size||1);
-    const litersTotal=litersPerBox * qty;
+    const litersPerBox=p.packNum*(p.size||1);
+    const litersTotal=litersPerBox*qty;
     totalBefore+=before; totalAfter+=after; totalUnits+=qty; totalLiters+=litersTotal;
     const ov=item.override;
-    const gDisc=parseFloat(document.getElementById('global-disc').value)||0;
+
+    // Build discount breakdown: show each applicable rule
+    let discBreakdown='';
+    const hasOverride = ov!==''&&ov!==null&&!isNaN(parseFloat(ov));
+    if(hasOverride){
+      discBreakdown=`<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">Override ${fmtD(parseFloat(ov))}%</span><span class="ci-price-val save">−${fmt(before*(parseFloat(ov)/100))} บ.</span></div>`;
+    } else {
+      discRules.forEach(r=>{
+        const rpct=parseFloat(r.pct)||0;
+        if(rpct>0&&ruleMatches(r,p)){
+          discBreakdown+=`<div class="ci-price-row"><span class="ci-price-label">📌 ${r.name} (${fmtD(rpct)}%)</span><span class="ci-price-val save" style="font-size:10px">−${fmt(before*(rpct/100))} บ.</span></div>`;
+        }
+      });
+      if(ctype==='cash') discBreakdown+=`<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">💵 เงินสด −1%</span><span class="ci-price-val save" style="font-size:10px"></span></div>`;
+    }
+
     html+=`<div class="ci">
       <div class="ci-top">
         <div>
@@ -1156,13 +1458,18 @@ function renderCart(){
         <span class="ci-ctrl-label">ลัง</span>
         <div class="qty-ctrl">
           <button class="qty-btn" onclick="changeQty('${p.code}',-1)">−</button>
-          <span class="qty-val">${qty}</span>
+          <input class="qty-input" id="qi_${p.code}" type="number" min="1" value="${qty}"
+            oninput="setQtyInput('${p.code}',this.value)"
+            onblur="if(!this.value||this.value<1){this.value=1;setQtyInput('${p.code}',1)}">
           <button class="qty-btn" onclick="changeQty('${p.code}',+1)">+</button>
         </div>
-        <div style="margin-left:6px;font-size:10px;color:var(--ink-soft)">${fmtL(litersTotal)} ล.</div>
+        <div style="margin-left:6px;font-size:11px;color:var(--ink-soft);font-weight:500">${fmtL(litersTotal)} ล.</div>
         <div class="override-wrap" style="margin-left:auto">
-          <span class="ci-ctrl-label">ลด %</span>
-          <input class="override-input" type="number" min="0" max="100" step="0.5" placeholder="${gDisc||'—'}" value="${ov}" oninput="setOverride('${p.code}',this.value)" title="ปล่อยว่าง = ใช้ global discount">
+          <span class="ci-ctrl-label">Override %</span>
+          <input class="override-input" type="number" min="0" max="100" step="0.5"
+            placeholder="—" value="${ov}"
+            oninput="setOverride('${p.code}',this.value)"
+            title="กำหนด % เองสำหรับสินค้านี้ ทับ rule ทุกอัน">
         </div>
       </div>
       <div class="ci-price-block">
@@ -1170,7 +1477,7 @@ function renderCart(){
           <span class="ci-price-label">ก่อนลด (${qty} ลัง)</span>
           <span class="ci-price-val${disc>0?' strike':''}">${fmt(before)} บ.</span>
         </div>
-        ${disc>0?`<div class="ci-price-row"><span class="ci-price-label">ส่วนลด ${fmtD(disc)}%</span><span class="ci-price-val save">−${fmt(saved)} บ.</span></div>`:''}
+        ${discBreakdown}
         <div class="ci-price-row">
           <span class="ci-price-label" style="font-weight:600">สุทธิ</span>
           <span class="ci-price-val final">${fmt(after)} บ.</span>
@@ -1183,17 +1490,41 @@ function renderCart(){
     </div>`;
   });
   cartEl.innerHTML=html;
+  _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters);
+}
+
+/* ─── SUMMARY ONLY — called from qty +/- to avoid full re-render ─── */
+function renderCartSummary(){
+  const items=Object.values(cart);
+  let totalBefore=0,totalAfter=0,totalUnits=0,totalLiters=0;
+  items.forEach(item=>{
+    const p=item.prod,qty=item.qty;
+    const disc=getDisc(p.code);
+    const before=p.unitPrice*qty;
+    totalBefore+=before; totalAfter+=before*(1-disc/100);
+    totalUnits+=qty; totalLiters+=(p.packNum*(p.size||1))*qty;
+  });
+  // Update qty displays in existing items without full rebuild
+  items.forEach(item=>{
+    const inp=document.getElementById('qi_'+item.prod.code);
+    if(inp&&document.activeElement!==inp) inp.value=item.qty;
+    // update liters display inside each card
+  });
+  document.getElementById('cart-count').textContent=items.reduce((a,c)=>a+c.qty,0);
+  _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters);
+}
+
+function _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters){
   const saved=totalBefore-totalAfter;
   document.getElementById('s-before').textContent=fmt(totalBefore)+' บ.';
   document.getElementById('s-disc').textContent='−'+fmt(saved)+' บ.';
   document.getElementById('s-total').textContent=fmt(totalAfter)+' บ.';
   document.getElementById('s-units').textContent=totalUnits+' ลัง';
   document.getElementById('s-liters').textContent=fmtL(totalLiters)+' ลิตร';
-  // cash row
   const cashRow=document.getElementById('s-cash-row');
   const cashAmt=document.getElementById('s-cash-amt');
   if(ctype==='cash'){
-    const cashSaving=Math.round(totalAfter/0.99*0.01); // 1% ของราคาก่อนหักเงินสด
+    const cashSaving=Math.round(totalAfter/0.99*0.01);
     cashRow.style.display='flex';
     cashAmt.textContent='−'+fmt(cashSaving)+' บ.';
   } else {
@@ -1201,7 +1532,7 @@ function renderCart(){
   }
 }
 
-renderSubBtns(); render(); renderCart();
+renderSubBtns(); render(); renderDiscRules(); renderCart();
 ncoGate({ title: "ราคาสินค้า Castrol", accentColor: "#007A3D" });
 </script>
 </body>

@@ -84,6 +84,25 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
     </div>
   </div>
   <!-- table -->
+  <!-- IN/OUT 14-day chart -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-3 mb-4 shadow-sm">
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <div class="text-[10px] text-slate-400">Movement 14 วันย้อนหลัง</div>
+        <div class="flex items-center gap-3 mt-0.5">
+          <span class="flex items-center gap-1.5 text-[10px]"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span><span class="text-slate-600 dark:text-slate-400">IN</span></span>
+          <span class="flex items-center gap-1.5 text-[10px]"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span><span class="text-slate-600 dark:text-slate-400">OUT</span></span>
+        </div>
+      </div>
+      <div class="flex p-0.5 bg-slate-100 dark:bg-slate-900 rounded-lg text-[10px]">
+        <label class="cursor-pointer"><input type="radio" name="chartCat" value="all" class="peer hidden" checked onchange="renderChart()"><span class="px-2 py-1 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-blue-600 text-slate-400 font-semibold">All</span></label>
+        <label class="cursor-pointer"><input type="radio" name="chartCat" value="PCO" class="peer hidden" onchange="renderChart()"><span class="px-2 py-1 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-blue-600 text-slate-400 font-semibold">PCO</span></label>
+        <label class="cursor-pointer"><input type="radio" name="chartCat" value="MCO" class="peer hidden" onchange="renderChart()"><span class="px-2 py-1 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-orange-600 text-slate-400 font-semibold">MCO</span></label>
+      </div>
+    </div>
+    <div id="chartHolder" class="h-32"></div>
+  </div>
+
   <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
     <div class="p-3 border-b border-slate-100 dark:border-slate-700">
       <input type="text" id="ovSearch" placeholder="ค้นหาสินค้า..." oninput="renderOverview()"
@@ -93,10 +112,10 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
       <table class="min-w-full text-sm">
         <thead class="bg-slate-50 dark:bg-slate-900/50 text-[9px] text-slate-400 font-semibold uppercase">
           <tr>
-            <th class="py-2 px-3 text-left">สินค้า</th>
-            <th class="py-2 px-2 text-right">นับล่าสุด</th>
-            <th class="py-2 px-2 text-right text-emerald-500">+IN</th>
-            <th class="py-2 px-2 text-right text-rose-500">−OUT</th>
+            <th class="py-2 px-2 text-left">สินค้า</th>
+            <th class="py-2 px-1.5 text-right">นับ</th>
+            <th class="py-2 px-1.5 text-right text-emerald-500">+IN</th>
+            <th class="py-2 px-1.5 text-right text-rose-500">−OUT</th>
             <th class="py-2 px-2 text-right font-bold text-slate-600 dark:text-slate-300">คงเหลือ</th>
           </tr>
         </thead>
@@ -108,12 +127,44 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
 
 <!-- ══ AUDIT ══ -->
 <div id="t-audit" class="tab px-1">
-  <div class="flex justify-between items-center mb-3">
+  <div class="flex justify-between items-start mb-3">
     <div>
       <h2 class="text-lg font-bold text-slate-700 dark:text-slate-200">ตรวจนับสต๊อก</h2>
       <p class="text-[9px] text-slate-400">อ. & พฤ. — น้องนับผ่านมือถือ</p>
     </div>
     <input type="date" id="auditDate" class="text-[11px] border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-400">
+  </div>
+
+  <!-- Audit progress banner -->
+  <div id="auditProgressBar" class="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 rounded-2xl p-3 mb-3 shadow-sm text-white">
+    <div class="flex justify-between items-center">
+      <div>
+        <div class="text-[10px] opacity-80">รอบนับนี้</div>
+        <div class="font-bold text-sm"><span id="auditProgressCount">0</span> / <span id="auditProgressTotal">0</span> SKU</div>
+      </div>
+      <button onclick="showUncountedList()" class="text-[10px] bg-white/20 hover:bg-white/30 active:scale-95 transition-all rounded-lg px-2.5 py-1.5 font-semibold whitespace-nowrap">
+        ดูสินค้าที่ยังไม่ได้นับ
+      </button>
+    </div>
+    <div class="mt-2 h-1 bg-white/20 rounded-full overflow-hidden">
+      <div id="auditProgressFill" class="h-full bg-white transition-all" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Uncounted list modal -->
+  <div id="uncountedModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end justify-center" onclick="event.target===this&&document.getElementById('uncountedModal').classList.add('hidden')">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl w-full max-w-2xl max-h-[75vh] overflow-hidden shadow-xl animate-su flex flex-col">
+      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex-shrink-0">
+        <div>
+          <div class="font-bold text-sm text-slate-700 dark:text-slate-200">สินค้าที่ยังไม่ได้นับ</div>
+          <div class="text-[10px] text-slate-400">เรียงตามคงเหลือมากไปน้อย</div>
+        </div>
+        <button onclick="document.getElementById('uncountedModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center active:scale-90">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="uncountedList" class="flex-1 overflow-y-auto p-3 space-y-1.5"></div>
+    </div>
   </div>
 
   <!-- search -->
@@ -231,32 +282,80 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
     </div>
   </div>
 
-  <!-- CSV OUT import -->
-  <div class="bg-gradient-to-r from-rose-600 to-rose-500 dark:from-rose-800 dark:to-rose-700 rounded-2xl p-4 shadow-md mb-4 text-white">
-    <h3 class="font-bold text-sm mb-1 flex items-center gap-2">
-      <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">↑</span>
-      นำเข้ายอดขายออก (CSV)
+  <!-- Quick Pick (เบิกไวไปหน้าร้าน) -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 shadow-sm mb-4">
+    <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2">
+      <span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-bold">⚡</span>
+      เบิกไว (หยิบไปหน้าร้าน)
     </h3>
-    <p class="text-[10px] text-rose-100 mb-3 leading-relaxed">อัปโหลดไฟล์ movement จากโปรแกรมบัญชี / หน้าร้าน<br>ต้องมีคอลัมน์: <span class="font-bold bg-white/20 px-1 rounded">Code</span> และ <span class="font-bold bg-white/20 px-1 rounded">Qty</span> (อ่านได้หลายรูปแบบ)</p>
-    <div class="flex items-center gap-2 mb-2">
-      <label class="bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-400 cursor-pointer px-4 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all shadow-sm">
-        เลือกไฟล์ CSV
-        <input type="file" accept=".csv" class="hidden" onchange="importCSV(event)">
-      </label>
-      <span id="csvStatus" class="text-[10px] text-rose-100">ยังไม่ได้เลือกไฟล์</span>
-    </div>
-    <!-- date range for this CSV -->
-    <div class="grid grid-cols-2 gap-2 mt-2">
-      <div>
-        <div class="text-[9px] text-rose-200 mb-1">วันที่เริ่มต้น</div>
-        <input type="date" id="csvDateFrom" class="w-full bg-white/20 border border-white/30 rounded-lg px-2 py-1.5 text-xs text-white placeholder-rose-200 focus:outline-none">
+    <p class="text-[10px] text-slate-400 mb-3">สำหรับภูมิ/เฟิร์น หยิบของไปให้ยนตประกิจ — เลือกหน่วยย่อยได้</p>
+    <div class="space-y-2">
+      <div class="relative">
+        <input type="text" id="qpSearch" autocomplete="off" placeholder="ค้นหาสินค้า..."
+          oninput="filterP('qp')" onfocus="filterP('qp',true)"
+          class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-500">
+        <input type="hidden" id="qpCode">
+        <ul id="qpPList" class="absolute left-0 right-0 z-20 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-48 overflow-y-auto hidden mt-1 divide-y divide-slate-100 dark:divide-slate-700/40"></ul>
       </div>
-      <div>
-        <div class="text-[9px] text-rose-200 mb-1">วันที่สิ้นสุด</div>
-        <input type="date" id="csvDateTo" class="w-full bg-white/20 border border-white/30 rounded-lg px-2 py-1.5 text-xs text-white placeholder-rose-200 focus:outline-none">
+      <!-- unit selector -->
+      <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-lg">
+        <label class="cursor-pointer text-center">
+          <input type="radio" name="qpUnit" value="case" class="peer hidden" checked onchange="updateQpPreview()">
+          <div class="py-1.5 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-amber-600 peer-checked:shadow-sm text-slate-400 text-xs font-semibold transition-all">ลัง</div>
+        </label>
+        <label class="cursor-pointer text-center">
+          <input type="radio" name="qpUnit" value="unit" class="peer hidden" onchange="updateQpPreview()">
+          <div class="py-1.5 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-amber-600 peer-checked:shadow-sm text-slate-400 text-xs font-semibold transition-all">กระป๋อง/ขวด</div>
+        </label>
+        <label class="cursor-pointer text-center">
+          <input type="radio" name="qpUnit" value="gallon" class="peer hidden" onchange="updateQpPreview()">
+          <div class="py-1.5 rounded-md peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-amber-600 peer-checked:shadow-sm text-slate-400 text-xs font-semibold transition-all">แกลลอน</div>
+        </label>
       </div>
+      <input type="number" id="qpQty" inputmode="numeric" placeholder="จำนวน" oninput="updateQpPreview()"
+        class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-2xl font-bold text-center bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-500">
+      <div id="qpPreview" class="hidden text-center text-[10px] text-slate-400"></div>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" id="qpNote" placeholder="หมายเหตุ (เช่น ของแถม)" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-500">
+        <input type="date" id="qpDate" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-500">
+      </div>
+      <button onclick="addQuickPick()" class="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2.5 font-bold text-sm shadow-md active:scale-95 transition-all">
+        ⚡ เบิกออก (ตัดสต๊อก)
+      </button>
     </div>
   </div>
+
+  <!-- Auto-sync from BC Account -->
+  <div class="bg-gradient-to-br from-emerald-600 to-emerald-500 dark:from-emerald-800 dark:to-emerald-700 rounded-2xl p-4 shadow-md mb-4 text-white">
+    <h3 class="font-bold text-sm mb-1 flex items-center gap-2">
+      <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">🔄</span>
+      Sync ยอดขายออกจาก BC Account
+    </h3>
+    <p class="text-[10px] text-emerald-100 mb-3 leading-relaxed">
+      ดึง sales_raw จาก Google Sheet อัตโนมัติ (ไม่ต้อง upload)<br>
+      BC Account export → Sheet → แตะปุ่มนี้ → ตัดสต๊อกให้เลย
+    </p>
+    <button onclick="syncBCSales()" id="syncBCBtn" class="w-full bg-white/95 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 hover:bg-white cursor-pointer px-4 py-3 rounded-xl text-sm font-bold active:scale-95 transition-all shadow-sm">
+      🔄 Sync ยอดขายล่าสุด
+    </button>
+    <div id="syncBCStatus" class="text-[10px] text-emerald-100 mt-2 text-center min-h-[14px]"></div>
+  </div>
+
+  <!-- Manual CSV upload (fallback) -->
+  <details class="bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 p-3 mb-4">
+    <summary class="text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer flex items-center gap-1.5">
+      <span class="text-slate-400">↑</span> อัปโหลด CSV เอง (ถ้า auto-sync ไม่ได้)
+    </summary>
+    <div class="mt-3">
+      <label class="bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200 text-rose-700 dark:text-rose-400 cursor-pointer px-3 py-2 rounded-xl text-xs font-bold inline-block active:scale-95 transition-all">
+        เลือกไฟล์ sales_raw.csv
+        <input type="file" accept=".csv" class="hidden" onchange="importCSV(event)">
+      </label>
+      <div id="csvStatus" class="text-[10px] text-slate-500 mt-2">ยังไม่ได้เลือกไฟล์</div>
+      <input type="date" id="csvDateFrom" class="hidden">
+      <input type="date" id="csvDateTo" class="hidden">
+    </div>
+  </details>
 
   <!-- movement log -->
   <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 shadow-sm">
@@ -279,6 +378,28 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
     <button onclick="renderFern()" class="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/40 px-2.5 py-1.5 rounded-lg font-semibold active:scale-95 transition-all">
       <i class="fas fa-sync-alt mr-1"></i>รีเฟรช
     </button>
+  </div>
+
+  <!-- Target Baht: PCO + MCO -->
+  <div class="grid grid-cols-2 gap-2 mb-3">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-700 dark:from-blue-700 dark:to-blue-900 rounded-xl p-3 text-white shadow-sm">
+      <div class="text-[9px] opacity-80 mb-0.5">PCO Turnover (30d)</div>
+      <div class="text-xl font-bold">฿<span id="fernPcoBaht">0</span></div>
+      <div class="flex items-center justify-between mt-1.5 gap-1">
+        <span class="text-[9px] opacity-70">Target:</span>
+        <input type="number" id="targetPCO" placeholder="0" oninput="onTargetChange()" class="w-full bg-white/20 border-0 rounded px-1.5 py-0.5 text-[11px] font-bold text-white placeholder-white/50 focus:outline-none focus:bg-white/30">
+      </div>
+      <div class="text-[9px] mt-1 text-right" id="fernPcoGap">—</div>
+    </div>
+    <div class="bg-gradient-to-br from-orange-500 to-orange-700 dark:from-orange-700 dark:to-orange-900 rounded-xl p-3 text-white shadow-sm">
+      <div class="text-[9px] opacity-80 mb-0.5">MCO Turnover (30d)</div>
+      <div class="text-xl font-bold">฿<span id="fernMcoBaht">0</span></div>
+      <div class="flex items-center justify-between mt-1.5 gap-1">
+        <span class="text-[9px] opacity-70">Target:</span>
+        <input type="number" id="targetMCO" placeholder="0" oninput="onTargetChange()" class="w-full bg-white/20 border-0 rounded px-1.5 py-0.5 text-[11px] font-bold text-white placeholder-white/50 focus:outline-none focus:bg-white/30">
+      </div>
+      <div class="text-[9px] mt-1 text-right" id="fernMcoGap">—</div>
+    </div>
   </div>
 
   <!-- stock day -->
@@ -312,10 +433,11 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
     <table class="min-w-full text-sm">
       <thead class="bg-slate-50 dark:bg-slate-900/50 text-[9px] text-slate-400 font-semibold uppercase">
         <tr>
-          <th class="py-2 px-3 text-left">สินค้า</th>
-          <th class="py-2 px-2 text-right">avg/วัน</th>
-          <th class="py-2 px-2 text-right">คงเหลือ</th>
-          <th class="py-2 px-2 text-right text-emerald-600 dark:text-emerald-400">แนะนำสั่ง</th>
+          <th class="py-2 px-2 text-left">สินค้า</th>
+          <th class="py-2 px-1.5 text-right">avg/วัน</th>
+          <th class="py-2 px-1.5 text-right">คงเหลือ</th>
+          <th class="py-2 px-1.5 text-right text-emerald-600 dark:text-emerald-400">สั่ง</th>
+          <th class="py-2 px-2 text-right text-emerald-600 dark:text-emerald-400">฿</th>
         </tr>
       </thead>
       <tbody id="fcBody" class="divide-y divide-slate-100 dark:divide-slate-700/40"></tbody>
@@ -334,47 +456,78 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
 
 <!-- ══ SETUP ══ -->
 <div id="t-setup" class="tab px-1">
-  <h2 class="text-lg font-bold mb-4 text-slate-700 dark:text-slate-200">จัดการสินค้า</h2>
-  <!-- add -->
+  <h2 class="text-lg font-bold mb-4 text-slate-700 dark:text-slate-200">ตั้งค่า</h2>
+
+  <!-- Alias mapping (most common use case) -->
   <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 shadow-sm mb-4">
-    <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">➕ เพิ่มสินค้า</h3>
+    <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2">🔗 ผูกรหัสใหม่กับสินค้าเดิม</h3>
+    <p class="text-[10px] text-slate-400 mb-3">เมื่อ BC Account ออกรหัสใหม่สำหรับสินค้าเดิม ผูกไว้ที่นี่</p>
     <div class="space-y-2">
+      <div class="relative">
+        <label class="text-[10px] text-slate-500 mb-1 block">1. สินค้าหลัก (ในระบบ)</label>
+        <input type="text" id="aliasSearch" autocomplete="off" placeholder="ค้นหาสินค้าเดิม..."
+          oninput="filterP('alias')" onfocus="filterP('alias',true)"
+          class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <input type="hidden" id="aliasCode">
+        <ul id="aliasPList" class="absolute left-0 right-0 z-20 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-48 overflow-y-auto hidden mt-1 divide-y divide-slate-100 dark:divide-slate-700/40"></ul>
+      </div>
+      <div>
+        <label class="text-[10px] text-slate-500 mb-1 block">2. รหัสใหม่ที่จะผูก</label>
+        <input type="text" id="aliasNew" placeholder="เช่น 3444999"
+          class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      </div>
+      <button onclick="addAlias()" class="w-full bg-blue-600 text-white rounded-xl py-2.5 font-bold text-sm shadow-md active:scale-95 transition-all">ผูกรหัส</button>
+    </div>
+  </div>
+
+  <!-- Product list (compact) -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 shadow-sm mb-4">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200">📦 รายการสินค้า</h3>
+      <span id="setupCount" class="text-[9px] text-slate-400">0 รายการ</span>
+    </div>
+    <input type="text" id="setupSearch" placeholder="ค้นหา..." oninput="renderSetup()" class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3">
+    <div id="setupList" class="space-y-1.5 max-h-96 overflow-y-auto hs"></div>
+  </div>
+
+  <!-- Advanced (collapsed) -->
+  <details class="bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 mb-4">
+    <summary class="text-sm font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">⚙️ Advanced — เพิ่มสินค้าใหม่</summary>
+    <div class="mt-3 space-y-2">
       <div class="grid grid-cols-2 gap-2">
-        <input type="text" id="nCode" placeholder="รหัส (เช่น GTX-4L)" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
-        <select id="nCat" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none">
+        <input type="text" id="nCode" placeholder="รหัส" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <select id="nCat" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none">
           <option value="PCO">PCO (รถยนต์)</option>
           <option value="MCO">MCO (มอไซค์)</option>
           <option value="CTSP">CTSP / อื่นๆ</option>
           <option value="NGK">NGK (หัวเทียน)</option>
         </select>
       </div>
-      <input type="text" id="nName" placeholder="ชื่อสินค้า" class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
-      <div class="grid grid-cols-2 gap-2">
-        <input type="number" id="nLiters" placeholder="ลิตร/ลัง" inputmode="decimal"
-          class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
-        <input type="text" id="nAlias" placeholder="alias (คั่นด้วย ,)"
-          class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      <input type="text" id="nName" placeholder="ชื่อสินค้า" class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      <div class="grid grid-cols-3 gap-2">
+        <input type="number" id="nLiters" placeholder="ลิตร/ลัง" inputmode="decimal" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <input type="number" id="nUPC" placeholder="ชิ้น/ลัง" inputmode="numeric" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <input type="number" id="nPrice" placeholder="ราคา/ลัง" inputmode="decimal" class="border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
       </div>
-      <button onclick="addProduct()" class="w-full bg-blue-600 text-white rounded-xl py-2.5 font-bold text-sm shadow-md active:scale-95 transition-all">เพิ่มสินค้า</button>
+      <input type="text" id="nAlias" placeholder="alias (คั่นด้วย ,)" class="w-full border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      <button onclick="addProduct()" class="w-full bg-blue-600 text-white rounded-xl py-2 font-bold text-xs active:scale-95 transition-all">เพิ่มสินค้าใหม่</button>
     </div>
-  </div>
-  <!-- list -->
-  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-4 shadow-sm mb-4">
-    <div class="flex justify-between items-center mb-3">
-      <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200">📦 รายการสินค้า</h3>
-      <span id="setupCount" class="text-[9px] text-slate-400">0 รายการ</span>
+  </details>
+
+  <!-- Danger zone (hidden by default) -->
+  <details class="bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/20 rounded-2xl p-4">
+    <summary class="text-xs text-red-600/70 dark:text-red-400/70 cursor-pointer flex items-center gap-2">
+      <span>⚠️</span> ล้างข้อมูล (ระวัง — ใช้เฉพาะตอนข้อมูลผิดจริงๆ)
+    </summary>
+    <div class="mt-3">
+      <p class="text-[10px] text-red-700/70 dark:text-red-300/70 mb-2">ใช้ปุ่มเหล่านี้เฉพาะตอนที่:<br>• ข้อมูลผิด/เสีย ต้องการเริ่มใหม่<br>• ทดสอบระบบ</p>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="clearAuditRounds()" class="bg-white dark:bg-slate-800 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-[10px] font-medium rounded-xl py-2 active:scale-95 transition-all">ล้างรอบนับ</button>
+        <button onclick="clearMovements()" class="bg-white dark:bg-slate-800 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-[10px] font-medium rounded-xl py-2 active:scale-95 transition-all">ล้าง IN/OUT</button>
+        <button onclick="clearAll()" class="bg-red-600 text-white text-[10px] font-bold rounded-xl py-2 active:scale-95 transition-all">ล้างทุกอย่าง</button>
+      </div>
     </div>
-    <div id="setupList" class="space-y-2 max-h-80 overflow-y-auto hs"></div>
-  </div>
-  <!-- danger -->
-  <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30 rounded-2xl p-4">
-    <h3 class="font-bold text-sm text-red-700 dark:text-red-400 mb-2"><i class="fas fa-exclamation-triangle mr-1.5"></i>ล้างข้อมูล</h3>
-    <div class="grid grid-cols-3 gap-2">
-      <button onclick="clearAuditRounds()" class="bg-white dark:bg-slate-800 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-[10px] font-medium rounded-xl py-2 active:scale-95 transition-all">ล้างรอบนับ</button>
-      <button onclick="clearMovements()" class="bg-white dark:bg-slate-800 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-[10px] font-medium rounded-xl py-2 active:scale-95 transition-all">ล้าง IN/OUT</button>
-      <button onclick="clearAll()" class="bg-red-600 text-white text-[10px] font-bold rounded-xl py-2 active:scale-95 transition-all shadow-md">ล้างทุกอย่าง</button>
-    </div>
-  </div>
+  </details>
 </div>
 
 </main>
@@ -418,8 +571,8 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
 // ═══════════════════════════════════════
 //  CONFIG — แก้สองบรรทัดนี้หลัง deploy
 // ═══════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxeSPUke9B5r-ilVuCfo2vdtBLOKSJetGdJvQqYbrZTxBlkP_usZWSeFSE3UvjhkdQ/exec';
-const MY_EMAIL   = 'poomprofile@gmail.com';
+const SCRIPT_URL = 'YOUR_SCRIPT_URL_HERE';
+const MY_EMAIL   = 'YOUR_EMAIL_HERE';
 
 // ═══════════════════════════════════════
 //  STORAGE: localStorage cache + Sheets sync
@@ -613,6 +766,7 @@ function goTab(id,btn){
   if(btn)btn.classList.add('act');
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='overview')renderOverview();
+  if(id==='audit')updateAuditProgress();
   if(id==='fern')renderFern();
   if(id==='movement')renderMvLog();
   if(id==='setup')renderSetup();
@@ -623,8 +777,10 @@ function goTab(id,btn){
 // ═══════════════════════════════════════
 let curAuditProd=null;
 function filterP(prefix,showAll=false){
-  const inp=document.getElementById(prefix==='in'?'inSearch':'auditSearch');
-  const listEl=document.getElementById(prefix==='in'?'inPList':'auditPList');
+  const map={'in':['inSearch','inPList'],'audit':['auditSearch','auditPList'],'qp':['qpSearch','qpPList'],'alias':['aliasSearch','aliasPList']};
+  const [inpId,listId]=map[prefix]||map['audit'];
+  const inp=document.getElementById(inpId);
+  const listEl=document.getElementById(listId);
   const kw=(inp.value||'').trim();
   const kwL=kw.toLowerCase();
   const prods=getProds();
@@ -658,7 +814,13 @@ function filterP(prefix,showAll=false){
     const li=document.createElement('li');
     li.className='px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex justify-between items-center transition-colors gap-2';
     li.innerHTML=`<div class="min-w-0 flex-grow"><div class="font-medium text-sm text-slate-800 dark:text-slate-200 leading-tight truncate">${p.name}</div><div class="text-[9px] text-slate-400 mt-0.5 flex items-center gap-1.5"><span class="font-mono tracking-wider">${p.code}</span>${p.subcat?`<span class="text-slate-300 dark:text-slate-600">·</span><span>${p.subcat}</span>`:''}</div></div><span class="text-[9px] px-1.5 py-0.5 rounded shrink-0 ${c.badge}">${c.l.split(' ')[0]}</span>`;
-    li.onclick=e=>{e.stopPropagation();if(prefix==='in'){document.getElementById('inSearch').value=p.name;document.getElementById('inCode').value=p.code;listEl.classList.add('hidden');}else{selectAuditP(p);}};
+    li.onclick=e=>{
+      e.stopPropagation();
+      if(prefix==='in'){document.getElementById('inSearch').value=p.name;document.getElementById('inCode').value=p.code;listEl.classList.add('hidden');}
+      else if(prefix==='qp'){document.getElementById('qpSearch').value=p.name;document.getElementById('qpCode').value=p.code;listEl.classList.add('hidden');updateQpPreview();}
+      else if(prefix==='alias'){document.getElementById('aliasSearch').value=`[${p.code}] ${p.name}`;document.getElementById('aliasCode').value=p.code;listEl.classList.add('hidden');}
+      else{selectAuditP(p);}
+    };
     listEl.appendChild(li);
   });
   listEl.classList.remove('hidden');
@@ -745,6 +907,59 @@ function renderDraft(){
     const item=d[code];const tot=item.pts.reduce((a,b)=>a+b,0);
     el.innerHTML+=`<div class="flex justify-between items-center bg-white dark:bg-slate-900/50 rounded-lg px-2.5 py-1.5 border border-slate-100 dark:border-slate-700/40 text-xs"><span class="truncate max-w-[160px] font-medium text-slate-700 dark:text-slate-300">${item.name}</span><span class="font-bold text-slate-700 dark:text-slate-200 shrink-0">${tot} ลัง</span></div>`;
   });
+  updateAuditProgress();
+}
+
+// ─── Audit progress: SKUs with stock vs SKUs counted this session ───
+function updateAuditProgress(){
+  const prods=getProds();
+  const stock=computeStock();
+  // total = SKUs that have stock (net > 0) OR were in prev round
+  const rounds=getRounds();
+  const lastRound=rounds.length?rounds.reduce((a,b)=>a.ts>=b.ts?a:b):null;
+  const prevCodes=new Set((lastRound?.entries||[]).map(e=>e.code));
+  const relevant=prods.filter(p=>{
+    const s=stock[p.code];
+    return (s?.net>0) || prevCodes.has(p.code);
+  });
+  const countedNow=new Set(Object.keys(getDraft()));
+  const done=relevant.filter(p=>countedNow.has(p.code)).length;
+  const total=relevant.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  const cntEl=document.getElementById('auditProgressCount');
+  const totEl=document.getElementById('auditProgressTotal');
+  const fillEl=document.getElementById('auditProgressFill');
+  if(cntEl){cntEl.textContent=done;totEl.textContent=total;fillEl.style.width=pct+'%';}
+}
+
+function showUncountedList(){
+  const prods=getProds();
+  const stock=computeStock();
+  const rounds=getRounds();
+  const lastRound=rounds.length?rounds.reduce((a,b)=>a.ts>=b.ts?a:b):null;
+  const prevCodes=new Set((lastRound?.entries||[]).map(e=>e.code));
+  const countedNow=new Set(Object.keys(getDraft()));
+  const uncounted=prods
+    .filter(p=>{const s=stock[p.code];return ((s?.net>0)||prevCodes.has(p.code)) && !countedNow.has(p.code);})
+    .map(p=>({p, net:(stock[p.code]?.net)||0}))
+    .sort((a,b)=>b.net-a.net);
+  const el=document.getElementById('uncountedList');
+  el.innerHTML='';
+  if(!uncounted.length){el.innerHTML='<div class="text-center py-8 text-xs text-slate-400">✓ นับครบทุก SKU แล้ว</div>';}
+  else uncounted.forEach(({p,net})=>{
+    const c=ct(p.category);
+    el.innerHTML+=`<div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl px-3 py-2.5 border border-slate-100 dark:border-slate-700/40 active:scale-[0.98] transition-all cursor-pointer" onclick="selectAuditP(${JSON.stringify(p).replace(/"/g,'&quot;')});document.getElementById('uncountedModal').classList.add('hidden');">
+      <div class="flex-grow min-w-0">
+        <div class="flex items-center gap-1.5 mb-0.5">
+          <span class="text-[9px] px-1.5 py-0.5 rounded ${c.badge}">${c.l.split(' ')[0]}</span>
+          <span class="text-[9px] text-slate-400 font-mono">${p.code}</span>
+        </div>
+        <div class="text-xs font-medium text-slate-700 dark:text-slate-200 leading-tight">${p.name}</div>
+      </div>
+      <span class="text-sm font-bold text-slate-600 dark:text-slate-300 shrink-0">${net}</span>
+    </div>`;
+  });
+  document.getElementById('uncountedModal').classList.remove('hidden');
 }
 function submitAudit(){
   const d=getDraft();const keys=Object.keys(d);
@@ -790,6 +1005,59 @@ function addIN(){
   toast(`รับเข้า ${p.name} ${qty} ลัง`,'success');
   renderMvLog();renderOverview();
   pushMovements([mv]); // sync to Sheets
+}
+
+// ─── Quick Pick (เบิกไว) ───
+function updateQpPreview(){
+  const code=document.getElementById('qpCode').value;
+  const unit=document.querySelector('input[name="qpUnit"]:checked')?.value||'case';
+  const qty=parseFloat(document.getElementById('qpQty').value)||0;
+  const prev=document.getElementById('qpPreview');
+  if(!code||!qty){prev.classList.add('hidden');return;}
+  const p=resolveCode(code);
+  if(!p){prev.classList.add('hidden');return;}
+  let cases=qty;
+  if(unit==='unit'){
+    const upc=p.unitsPerCase||12;
+    cases=qty/upc;
+    prev.textContent=`= ${cases.toFixed(3)} ลัง (1 ลัง = ${upc} ${unit==='unit'?'ชิ้น':''})`;
+  } else if(unit==='gallon'){
+    // 1 แกลลอน = ถ้า liters ของสินค้าแสดงเป็นแกลลอน (เช่น 18L), นับ 1 ต่อ 1 ลัง
+    // แต่ถ้าลังรวม = หลาย แกลลอน (เช่น 4x5L = 4 แกลลอน/ลัง) → 1 แกลลอน = 0.25 ลัง
+    const upc=p.unitsPerCase||1;
+    cases=qty/upc;
+    prev.textContent=`= ${cases.toFixed(3)} ลัง (1 ลัง = ${upc} แกลลอน)`;
+  } else {
+    prev.textContent=`= ${qty} ลัง`;
+  }
+  prev.classList.remove('hidden');
+}
+
+function addQuickPick(){
+  const code=document.getElementById('qpCode').value.trim();
+  const qty=parseFloat(document.getElementById('qpQty').value)||0;
+  const unit=document.querySelector('input[name="qpUnit"]:checked')?.value||'case';
+  const date=document.getElementById('qpDate').value||new Date().toISOString().slice(0,10);
+  const note=document.getElementById('qpNote').value.trim();
+  if(!code){toast('เลือกสินค้าก่อน','warn');return;}
+  if(qty<=0){toast('กรอกจำนวน','warn');return;}
+  const p=resolveCode(code);
+  if(!p){toast('ไม่พบสินค้า','error');return;}
+  // convert to cases
+  let cases=qty;
+  const upc=p.unitsPerCase||12;
+  if(unit==='unit'||unit==='gallon')cases=qty/upc;
+  const ref=`เบิกไว${note?' · '+note:''}`;
+  const mv={id:Date.now(),type:'OUT',code:p.code,name:p.name,qty:Math.round(cases*1000)/1000,date,ref,ts:new Date().toISOString()};
+  const moves=getMoves();moves.push(mv);saveMoves(moves);
+  document.getElementById('qpSearch').value='';
+  document.getElementById('qpCode').value='';
+  document.getElementById('qpQty').value='';
+  document.getElementById('qpNote').value='';
+  document.getElementById('qpPreview').classList.add('hidden');
+  toast(`เบิก ${p.name} ${qty} ${unit==='case'?'ลัง':unit==='unit'?'ชิ้น':'แกลลอน'} ✓`,'success');
+  renderMvLog();renderOverview();
+  pushMovements([mv]);
 }
 // parse BCAccount number format: "$1.00" "(1.00)" → float
 function parseBCNum(s){
@@ -864,6 +1132,22 @@ function importCSV(event){
     event.target.value='';
   }});
 }
+// ─── Sync from BC Account Sheet (auto) ───
+async function syncBCSales(){
+  const btn=document.getElementById('syncBCBtn');
+  const status=document.getElementById('syncBCStatus');
+  if(!isConfigured()){status.textContent='ยังไม่ตั้งค่า Apps Script';return;}
+  btn.disabled=true;btn.style.opacity='0.6';
+  status.textContent='กำลัง sync...';
+  const result=await apiPost('syncBCSales',{});
+  btn.disabled=false;btn.style.opacity='1';
+  if(!result){status.textContent='sync ไม่สำเร็จ';return;}
+  status.textContent=`✓ ดึงมา ${result.rowsRead||0} rows · เพิ่มใหม่ ${result.added||0} รายการ`;
+  // reload data from Sheets after sync
+  await syncFromSheets();
+  toast(`Sync สำเร็จ: ${result.added||0} รายการใหม่`,'success');
+}
+
 function renderMvLog(){
   const moves=getMoves().slice().reverse().slice(0,60);
   const el=document.getElementById('mvLog');
@@ -901,6 +1185,12 @@ function renderOverview(){
   const stock=computeStock();
   const moves=getMoves();
   const lastDate=getLastAuditDate();
+  // compute which SKUs were missing from the latest audit round
+  const rounds=getRounds();
+  const lastRound=rounds.length?rounds.reduce((a,b)=>a.ts>=b.ts?a:b):null;
+  const countedCodes=new Set((lastRound?.entries||[]).map(e=>e.code));
+  window.lastAuditRoundMissing = new Set(prods.filter(p=>!countedCodes.has(p.code)).map(p=>p.code));
+  const lastAuditRoundMissing = window.lastAuditRoundMissing;
   document.getElementById('ov-sku').textContent=prods.length;
   // sum IN/OUT after last audit
   let totalIn=0,totalOut=0;
@@ -922,21 +1212,72 @@ function renderOverview(){
     tbody.innerHTML+=`<tr><td colspan="5" class="py-1.5 px-3 text-[9px] font-bold ${c.badge}">${c.l}</td></tr>`;
     items.forEach(({p,s})=>{
       const net=s.net??0;const low=net<5;
-      tbody.innerHTML+=`<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-        <td class="py-2 px-3"><div class="font-medium text-xs text-slate-800 dark:text-slate-200 truncate max-w-[110px]">${p.name}</div><div class="text-[9px] text-slate-400">${p.code}</div></td>
-        <td class="py-2 px-2 text-right text-xs text-slate-400">${s.base??'—'}</td>
-        <td class="py-2 px-2 text-right text-xs text-emerald-500 dark:text-emerald-400 font-medium">${s.inAfter>0?'+'+s.inAfter:'—'}</td>
-        <td class="py-2 px-2 text-right text-xs text-rose-500 dark:text-rose-400 font-medium">${s.outAfter>0?'-'+s.outAfter:'—'}</td>
+      // detect "not counted in last audit round"
+      const notCounted = lastAuditRoundMissing.has(p.code) && s.base > 0;
+      tbody.innerHTML+=`<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${notCounted?'bg-amber-50/40 dark:bg-amber-900/10':''}">
+        <td class="py-2 px-2">
+          <div class="font-medium text-[11px] text-slate-800 dark:text-slate-200 leading-tight break-words" style="word-break:break-word">${p.name}</div>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-[9px] text-slate-400 font-mono">${p.code}</span>
+            ${notCounted?'<span class="text-[8px] bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded font-bold">ยังไม่นับ</span>':''}
+          </div>
+        </td>
+        <td class="py-2 px-1.5 text-right text-xs text-slate-400">${s.base??'—'}</td>
+        <td class="py-2 px-1.5 text-right text-xs text-emerald-500 dark:text-emerald-400 font-medium">${s.inAfter>0?'+'+s.inAfter:'—'}</td>
+        <td class="py-2 px-1.5 text-right text-xs text-rose-500 dark:text-rose-400 font-medium">${s.outAfter>0?'-'+s.outAfter:'—'}</td>
         <td class="py-2 px-2 text-right text-sm font-bold ${low?'text-red-500 dark:text-red-400':'text-slate-700 dark:text-slate-200'}">${net}</td>
       </tr>`;
     });
   });
   if(!filtered.length)tbody.innerHTML='<tr><td colspan="5" class="py-6 text-center text-xs text-slate-400">ไม่พบสินค้า</td></tr>';
+  renderChart();
 }
 
 // ═══════════════════════════════════════
 //  FERN REVIEW TAB
 // ═══════════════════════════════════════
+function renderChart(){
+  const el=document.getElementById('chartHolder');
+  if(!el)return;
+  const catFilter=document.querySelector('input[name="chartCat"]:checked')?.value||'all';
+  const prods=getProds();
+  const prodMap={};prods.forEach(p=>prodMap[p.code]=p);
+  const moves=getMoves();
+  // group by date
+  const days=14;
+  const today=new Date();today.setHours(0,0,0,0);
+  const dates=[];
+  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().slice(0,10));}
+  const dayIn={};const dayOut={};
+  dates.forEach(d=>{dayIn[d]=0;dayOut[d]=0;});
+  moves.forEach(m=>{
+    if(!dates.includes(m.date))return;
+    const p=prodMap[m.code];
+    if(catFilter!=='all' && (!p || p.category!==catFilter))return;
+    if(m.type==='IN')dayIn[m.date]+=m.qty;
+    else dayOut[m.date]+=m.qty;
+  });
+  const maxVal=Math.max(1,...dates.map(d=>Math.max(dayIn[d],dayOut[d])));
+  // render as SVG bars
+  const W=el.clientWidth||340,H=120;
+  const barW=(W-20)/days/2-1.5;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">`;
+  dates.forEach((d,i)=>{
+    const inH=dayIn[d]/maxVal*(H-30);
+    const outH=dayOut[d]/maxVal*(H-30);
+    const x=10+i*((W-20)/days);
+    svg+=`<rect x="${x}" y="${H-20-inH}" width="${barW}" height="${inH}" fill="#10b981" rx="1.5"/>`;
+    svg+=`<rect x="${x+barW+1}" y="${H-20-outH}" width="${barW}" height="${outH}" fill="#f43f5e" rx="1.5"/>`;
+    // x label (show every 2nd day)
+    if(i%2===0){
+      const dd=new Date(d);
+      svg+=`<text x="${x+barW}" y="${H-5}" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="Kanit">${dd.getDate()}/${dd.getMonth()+1}</text>`;
+    }
+  });
+  svg+=`</svg>`;
+  el.innerHTML=svg;
+}
+
 function onSD(){
   const v=parseInt(document.getElementById('sdSlider').value);
   const lbl={30:'30 วัน (1 เดือน)',60:'60 วัน (2 เดือน)',90:'90 วัน (3 เดือน)',120:'120 วัน (4 เดือน)'};
@@ -948,6 +1289,12 @@ function renderFern(){
   document.getElementById('sdSlider').value=sd;
   const lbl={30:'30 วัน (1 เดือน)',60:'60 วัน (2 เดือน)',90:'90 วัน (3 เดือน)',120:'120 วัน (4 เดือน)'};
   document.getElementById('sdLabel').textContent=lbl[sd]||`${sd} วัน`;
+
+  // targets from LS
+  const tPCO=parseFloat(LS.g('nco_targetPCO'))||0;
+  const tMCO=parseFloat(LS.g('nco_targetMCO'))||0;
+  document.getElementById('targetPCO').value=tPCO||'';
+  document.getElementById('targetMCO').value=tMCO||'';
 
   // ─── diff from latest round ───
   const rounds=getRounds();
@@ -962,33 +1309,56 @@ function renderFern(){
       const dl=document.getElementById('diffList');dl.innerHTML='';
       diffs.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).forEach(e=>{
         const dc=e.diff>0?'text-emerald-600 dark:text-emerald-400':'text-red-600 dark:text-red-400';
-        const icon=e.diff>0?'fa-arrow-up':'fa-arrow-down';
+        const icon=e.diff>0?'↑':'↓';
         dl.innerHTML+=`<div class="flex justify-between items-center bg-white dark:bg-slate-800/60 rounded-lg px-3 py-2 border border-amber-100 dark:border-amber-900/30 text-xs">
           <span class="font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]">${e.name}</span>
-          <div class="flex items-center gap-3 shrink-0">
-            <span class="text-slate-400">ระบบ ${e.system}</span>
-            <span class="font-bold text-slate-700 dark:text-slate-200">นับ ${e.counted}</span>
-            <span class="font-bold ${dc}"><i class="fas ${icon} text-[9px] mr-0.5"></i>${Math.abs(e.diff)}</span>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-slate-400 text-[10px]">ระบบ ${e.system}</span>
+            <span class="font-bold text-slate-700 dark:text-slate-200 text-[10px]">นับ ${e.counted}</span>
+            <span class="font-bold ${dc}">${icon}${Math.abs(e.diff)}</span>
           </div>
         </div>`;
       });
     } else noDiff.classList.remove('hidden');
   }
 
-  // ─── forecast ───
+  // ─── Turnover & forecast ───
   const moves=getMoves();
   const prods=getProds();
+  const prodMap={};prods.forEach(p=>prodMap[p.code]=p);
   const stock=computeStock();
-  // compute avg daily OUT per product across all moves
+
+  // compute last-30-days turnover (baht) by category
+  const today=new Date();today.setHours(0,0,0,0);
+  const d30=new Date(today);d30.setDate(d30.getDate()-30);
+  let bahtPCO=0,bahtMCO=0;
+  moves.filter(m=>m.type==='OUT').forEach(m=>{
+    if(new Date(m.date) < d30)return;
+    const p=prodMap[m.code];if(!p)return;
+    const baht=(p.price||0)*m.qty;
+    if(p.category==='PCO')bahtPCO+=baht;
+    else if(p.category==='MCO')bahtMCO+=baht;
+  });
+  document.getElementById('fernPcoBaht').textContent=Math.round(bahtPCO).toLocaleString();
+  document.getElementById('fernMcoBaht').textContent=Math.round(bahtMCO).toLocaleString();
+
+  // gap from target
+  const pcoGap=document.getElementById('fernPcoGap');
+  const mcoGap=document.getElementById('fernMcoGap');
+  if(tPCO>0){const d=tPCO-bahtPCO;pcoGap.innerHTML=d<=0?'<span class="font-bold">✓ ถึงเป้าแล้ว</span>':`ขาดอีก ฿${Math.round(d).toLocaleString()}`;}
+  else pcoGap.textContent='—';
+  if(tMCO>0){const d=tMCO-bahtMCO;mcoGap.innerHTML=d<=0?'<span class="font-bold">✓ ถึงเป้าแล้ว</span>':`ขาดอีก ฿${Math.round(d).toLocaleString()}`;}
+  else mcoGap.textContent='—';
+
+  // ─── avg daily OUT per product ───
   const outMap={};const dateSet=new Set();
   moves.filter(m=>m.type==='OUT').forEach(m=>{
     if(!outMap[m.code])outMap[m.code]=0;
     outMap[m.code]+=m.qty;
     dateSet.add(m.date);
   });
-  // span from first to last OUT date
   const dates=Array.from(dateSet).sort();
-  const spanDays=dates.length>=2?Math.max(1,(new Date(dates[dates.length-1])-new Date(dates[0]))/(86400000)+1):30;
+  const spanDays=dates.length>=2?Math.max(1,(new Date(dates[dates.length-1])-new Date(dates[0]))/86400000+1):30;
   document.getElementById('fcPeriod').textContent=dates.length>=2?`ข้อมูล ${fmtDate(dates[0])} – ${fmtDate(dates[dates.length-1])} (${Math.round(spanDays)} วัน)`:'';
 
   const fcBody=document.getElementById('fcBody');const fcEmpty=document.getElementById('fcEmpty');
@@ -999,22 +1369,35 @@ function renderFern(){
     const need=Math.ceil(avgDay*sd);
     const net=(stock[p.code]||{net:0}).net;
     const suggest=Math.max(0,need-net);
-    return{p,avgDay,net,suggest};
-  }).filter(Boolean).sort((a,b)=>b.suggest-a.suggest||b.avgDay-a.avgDay);
+    const baht=suggest*(p.price||0);
+    return{p,avgDay,net,suggest,baht};
+  }).filter(Boolean);
 
   fcBody.innerHTML='';
   if(!rows.length){fcEmpty.classList.remove('hidden');return;}
   fcEmpty.classList.add('hidden');
-  rows.forEach(r=>{
-    const c=ct(r.p.category);
-    const sug=r.suggest>0?`<span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-lg font-bold text-xs">+${r.suggest}</span>`:`<span class="text-slate-300 dark:text-slate-600 text-xs">พอใช้</span>`;
-    const low=r.net<5?'text-red-500 dark:text-red-400 font-bold':'text-slate-600 dark:text-slate-300';
-    fcBody.innerHTML+=`<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-      <td class="py-2 px-3"><div class="text-xs font-medium text-slate-800 dark:text-slate-200 truncate max-w-[110px]">${r.p.name}</div><span class="text-[9px] px-1.5 py-0.5 rounded ${c.badge}">${c.l.split(' ')[0]}</span></td>
-      <td class="py-2 px-2 text-right text-xs text-slate-500">${r.avgDay.toFixed(2)}</td>
-      <td class="py-2 px-2 text-right text-xs ${low}">${r.net}</td>
-      <td class="py-2 px-2 text-right">${sug}</td>
-    </tr>`;
+
+  // group by category with subtotal
+  const grouped={PCO:[],MCO:[]};
+  rows.forEach(r=>{if(grouped[r.p.category])grouped[r.p.category].push(r);});
+  ['PCO','MCO'].forEach(cat=>{
+    const items=grouped[cat];if(!items.length)return;
+    items.sort((a,b)=>b.baht-a.baht||b.suggest-a.suggest);
+    const c=ct(cat);
+    const subtotal=items.reduce((s,r)=>s+r.baht,0);
+    const subSuggest=items.reduce((s,r)=>s+r.suggest,0);
+    fcBody.innerHTML+=`<tr><td colspan="5" class="py-1.5 px-2 text-[9px] font-bold ${c.badge}"><div class="flex justify-between"><span>${c.l}</span><span>รวมสั่ง ${subSuggest} ลัง = ฿${Math.round(subtotal).toLocaleString()}</span></div></td></tr>`;
+    items.forEach(r=>{
+      const sug=r.suggest>0?`<span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded font-bold text-[10px]">+${r.suggest}</span>`:`<span class="text-slate-300 dark:text-slate-600 text-[10px]">พอ</span>`;
+      const low=r.net<5?'text-red-500 dark:text-red-400 font-bold':'text-slate-600 dark:text-slate-300';
+      fcBody.innerHTML+=`<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+        <td class="py-2 px-2"><div class="text-[11px] font-medium text-slate-800 dark:text-slate-200 leading-tight break-words" style="word-break:break-word">${r.p.name}</div><div class="text-[9px] text-slate-400 mt-0.5 font-mono">${r.p.code}</div></td>
+        <td class="py-2 px-1.5 text-right text-[10px] text-slate-500">${r.avgDay.toFixed(2)}</td>
+        <td class="py-2 px-1.5 text-right text-[10px] ${low}">${r.net}</td>
+        <td class="py-2 px-1.5 text-right">${sug}</td>
+        <td class="py-2 px-2 text-right text-[10px] text-slate-600 dark:text-slate-300 font-semibold">${r.baht>0?Math.round(r.baht).toLocaleString():'—'}</td>
+      </tr>`;
+    });
   });
 
   // ─── audit history ───
@@ -1034,7 +1417,7 @@ function renderFern(){
         </div>
         <div class="flex items-center gap-2">
           ${hasDiff?`<span class="text-[9px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-bold">มีผลต่าง</span>`:`<span class="text-[9px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">✓ ตรง</span>`}
-          <i class="fas fa-chevron-down text-slate-300 text-xs transition-transform" id="ico-${r.id}"></i>
+          <svg class="w-3 h-3 text-slate-300 transition-transform" id="ico-${r.id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
       <div id="rd-${r.id}" class="hidden">
@@ -1050,6 +1433,13 @@ function renderFern(){
     </div>`;
   });
 }
+
+function onTargetChange(){
+  LS.s('nco_targetPCO', parseFloat(document.getElementById('targetPCO').value)||0);
+  LS.s('nco_targetMCO', parseFloat(document.getElementById('targetMCO').value)||0);
+  renderFern();
+}
+
 function toggleR(id){
   const el=document.getElementById(`rd-${id}`);const ic=document.getElementById(`ico-${id}`);
   el.classList.toggle('hidden');ic.style.transform=el.classList.contains('hidden')?'':'rotate(180deg)';
@@ -1059,20 +1449,42 @@ function toggleR(id){
 //  SETUP TAB
 // ═══════════════════════════════════════
 function addProduct(){
-  const code=(document.getElementById('nCode').value||'').trim().toUpperCase();
+  const code=(document.getElementById('nCode').value||'').trim();
   const name=(document.getElementById('nName').value||'').trim();
   const cat=document.getElementById('nCat').value;
   const liters=parseFloat(document.getElementById('nLiters').value)||0;
+  const upc=parseInt(document.getElementById('nUPC').value)||12;
+  const price=parseFloat(document.getElementById('nPrice').value)||0;
   const aliasRaw=(document.getElementById('nAlias').value||'').trim();
-  const aliases=aliasRaw?aliasRaw.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean):[];
+  const aliases=aliasRaw?aliasRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
   if(!code||!name){toast('กรอกรหัสและชื่อ','warn');return;}
   const prods=getProds();
   if(prods.find(p=>p.code===code)){toast('รหัสซ้ำ','error');return;}
-  prods.push({code,name,category:cat,liters,aliases});
+  prods.push({code,name,category:cat,subcat:'',liters,unitsPerCase:upc,price,aliases});
   saveProds(prods);
-  ['nCode','nName','nLiters','nAlias'].forEach(id=>document.getElementById(id).value='');
+  ['nCode','nName','nLiters','nUPC','nPrice','nAlias'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   toast(`เพิ่ม ${name} ✓`,'success');renderSetup();renderOverview();
-  pushProducts(); // sync to Sheets
+  pushProducts();
+}
+
+function addAlias(){
+  const code=document.getElementById('aliasCode').value.trim();
+  const newCode=(document.getElementById('aliasNew').value||'').trim();
+  if(!code){toast('เลือกสินค้าหลัก','warn');return;}
+  if(!newCode){toast('กรอกรหัสใหม่','warn');return;}
+  const prods=getProds();
+  const p=prods.find(x=>x.code===code);
+  if(!p){toast('ไม่พบสินค้าหลัก','error');return;}
+  if(!p.aliases)p.aliases=[];
+  if(p.aliases.includes(newCode)){toast('ผูกอยู่แล้ว','info');return;}
+  p.aliases.push(newCode);
+  saveProds(prods);
+  document.getElementById('aliasSearch').value='';
+  document.getElementById('aliasCode').value='';
+  document.getElementById('aliasNew').value='';
+  toast(`ผูก ${newCode} กับ ${p.name} ✓`,'success');
+  renderSetup();
+  pushProducts();
 }
 function delProduct(code){
   if(!confirm(`ลบ ${code}?`))return;
@@ -1080,19 +1492,29 @@ function delProduct(code){
 }
 function renderSetup(){
   const prods=getProds();const stock=computeStock();
-  document.getElementById('setupCount').textContent=`${prods.length} รายการ`;
+  const kw=(document.getElementById('setupSearch')?.value||'').toLowerCase();
+  const filtered=kw?prods.filter(p=>p.name.toLowerCase().includes(kw)||p.code.toLowerCase().includes(kw)||(p.aliases||[]).some(a=>String(a).toLowerCase().includes(kw))):prods;
+  document.getElementById('setupCount').textContent=`${filtered.length} / ${prods.length}`;
   const el=document.getElementById('setupList');el.innerHTML='';
-  if(!prods.length){el.innerHTML='<div class="text-center py-8 text-xs text-slate-400"><i class="fas fa-box-open text-xl block mb-2 opacity-30"></i>ยังไม่มีสินค้า</div>';return;}
-  prods.forEach(p=>{
+  if(!filtered.length){el.innerHTML='<div class="text-center py-8 text-xs text-slate-400">ยังไม่มีสินค้า</div>';return;}
+  filtered.forEach(p=>{
     const c=ct(p.category);const s=(stock[p.code]||{net:0}).net;
-    el.innerHTML+=`<div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-3 py-2.5 border border-slate-100 dark:border-slate-700/40">
+    const price=p.price?`฿${Math.round(p.price).toLocaleString()}`:'';
+    el.innerHTML+=`<div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-3 py-2 border border-slate-100 dark:border-slate-700/40">
       <div class="flex-grow min-w-0">
-        <div class="flex items-center gap-1.5 mb-0.5"><span class="text-[9px] px-1.5 py-0.5 rounded ${c.badge}">${c.l.split(' ')[0]}</span><span class="text-[9px] text-slate-400">${p.code}</span>${p.aliases&&p.aliases.length?`<span class="text-[9px] text-slate-300 dark:text-slate-600">(${p.aliases.join(', ')})</span>`:''}</div>
-        <div class="font-medium text-xs text-slate-700 dark:text-slate-200 truncate">${p.name}</div>
+        <div class="flex items-center gap-1.5 mb-0.5">
+          <span class="text-[9px] px-1.5 py-0.5 rounded ${c.badge}">${c.l.split(' ')[0]}</span>
+          <span class="text-[9px] text-slate-400 font-mono">${p.code}</span>
+          ${price?`<span class="text-[9px] text-slate-400">· ${price}/ลัง</span>`:''}
+        </div>
+        <div class="font-medium text-[11px] text-slate-700 dark:text-slate-200 leading-tight">${p.name}</div>
+        ${p.aliases&&p.aliases.length?`<div class="text-[9px] text-slate-400 mt-0.5">alias: ${p.aliases.join(', ')}</div>`:''}
       </div>
-      <div class="flex items-center gap-2 shrink-0">
-        <span class="font-bold text-sm ${s<5?'text-red-500 dark:text-red-400':'text-slate-600 dark:text-slate-300'}">${s}</span>
-        <button onclick="delProduct('${p.code}')" class="text-red-400 hover:text-red-500 w-7 h-7 flex items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 active:scale-90"><i class="fas fa-trash text-[10px]"></i></button>
+      <div class="flex items-center gap-1 shrink-0">
+        <span class="font-bold text-xs ${s<5?'text-red-500':'text-slate-600 dark:text-slate-300'}">${s}</span>
+        <button onclick="delProduct('${p.code}')" class="text-red-300 hover:text-red-500 w-6 h-6 flex items-center justify-center rounded-full active:scale-90" title="ลบ">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
       </div>
     </div>`;
   });
@@ -1129,7 +1551,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 
   // ─── Real product master (Stock 16/4) ───
-  const SEED_PRODUCTS=[{"code": "3429277", "name": "GO!2T 12X1L. HL", "category": "MCO", "subcat": "2T-GO", "liters": 12.0, "initStock": 527, "aliases": ["GO 2T 12x1L"]}, {"code": "3429278", "name": "GO!2T 12X0.5L. HL", "category": "MCO", "subcat": "2T-GO", "liters": 6.0, "initStock": 237, "aliases": ["GO 2T 12x0.5L"]}, {"code": "3435677", "name": "ACTIV ES. SAE 40   12 X 0.7L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 8.4, "initStock": 110, "aliases": ["ACTIV ESS 12x0.7L"]}, {"code": "3435678", "name": "ACTIV ES. SAE 40   12 X 0.8L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 9.6, "initStock": 447, "aliases": ["ACTIV ESS 12x0.8L"]}, {"code": "3435676", "name": "ACTIV ES. SAE 40   12 X 1L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 12.0, "initStock": 38, "aliases": ["ACTIV ESS 12x1L"]}, {"code": "3440370", "name": "POWER1 UL 4T 10W30(FS) 12X1L", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "initStock": 0, "aliases": ["PW1 UL 10/30 12x1L"]}, {"code": "3440367", "name": "POWER1 UL 10W40 4T 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "initStock": 10, "aliases": ["PW1 UL 10/40 12x1L"]}, {"code": "3440258", "name": "POWER1 UL 10W50 4T 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "initStock": 10, "aliases": ["PW1 UL 10/50 12x1L"]}, {"code": "3440472", "name": "POWER1 ULT AUTO 5W40 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "initStock": 8, "aliases": ["PW1 UL 5/40 12x1L"]}, {"code": "3439375", "name": "POWER1 4T 10W30 12x1L R", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "initStock": 33, "aliases": ["PW1 4T 12x1L"]}, {"code": "3439376", "name": "POWER1 4T 10W30 12x0.8L R", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "initStock": 233, "aliases": ["PW1 4T 12x0.8L"]}, {"code": "3438928", "name": "POWER1 AT 10W40 12X0.8L SP R", "category": "MCO", "subcat": "4T-PW SCT", "liters": 9.6, "initStock": 5, "aliases": ["PW1 AT \u0e40\u0e14\u0e35\u0e48\u0e22\u0e27 12x0.8L"]}, {"code": "3442715", "name": "POWER1 AT 10W40+SGO 12X0.92L", "category": "MCO", "subcat": "4T-PW SCT", "liters": 11.0, "initStock": 111, "aliases": ["PW1 AT \u0e04\u0e39\u0e48 12x0.92L"]}, {"code": "3442231", "name": "POWER1 4T 10W40  \u0e43\u0e2b\u0e21\u0e48 12x1L", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "initStock": 54, "aliases": ["PW1 4T 10/40 \u0e43\u0e2b\u0e21\u0e48 12x1L"]}, {"code": "3442232", "name": "POWER1 4T 10W40  \u0e43\u0e2b\u0e21\u0e48 12x0.8L", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "initStock": 75, "aliases": ["PW1 4T 10/40 \u0e43\u0e2b\u0e21\u0e48 12x0.8L"]}, {"code": "3442108", "name": "POWER1 AUTO 10W30 12X0.8L N", "category": "MCO", "subcat": "4T-PW SCT", "liters": 9.6, "initStock": 19, "aliases": ["PW1 AT \u0e04\u0e39\u0e48 10/30 \u0e43\u0e2b\u0e21\u0e48 6x0.92L"]}, {"code": "3442330", "name": "POWER1 AT 10W30+SGO 6X0.92L N", "category": "MCO", "subcat": "4T-PW SCT", "liters": 5.5, "initStock": 32, "aliases": ["PW1 AT \u0e40\u0e14\u0e35\u0e48\u0e22\u0e27 10/30 \u0e43\u0e2b\u0e21\u0e48 12x0.8L"]}, {"code": "3444620", "name": "POWER1 4T 10W-30 12X1L (\u0e23\u0e38\u0e48\u0e19\u0e41\u0e16\u0e21\u0e40\u0e2a\u0e37\u0e49\u0e2d)", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "initStock": 59, "aliases": ["PW1 4T 12x1L"]}, {"code": "3444621", "name": "POWER1 4T 10W-30 12X0.8L(\u0e23\u0e38\u0e48\u0e19\u0e41\u0e16\u0e21\u0e40\u0e2a\u0e37\u0e49\u0e2d)", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "initStock": 161, "aliases": ["PW1 4T 12x0.8L"]}, {"code": "3441679", "name": "POWER1 4T 10W-40  12X1L (\u0e23\u0e38\u0e48\u0e19\u0e41\u0e16\u0e21\u0e40\u0e2a\u0e37\u0e49\u0e2d)", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "initStock": 5, "aliases": ["PW1 4T 10/40 \u0e43\u0e2b\u0e21\u0e48 12x1L"]}, {"code": "3441680", "name": "POWER1 4T 10W-40 12X0.8L (\u0e23\u0e38\u0e48\u0e19\u0e41\u0e16\u0e21\u0e40\u0e2a\u0e37\u0e49\u0e2d)", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "initStock": 8, "aliases": ["PW1 4T 10/40 \u0e43\u0e2b\u0e21\u0e48 12x0.8L"]}, {"code": "3439390", "name": "ACTIV 4T 20W40 12X1L R", "category": "MCO", "subcat": "ACTIV 4T", "liters": 12.0, "initStock": 506, "aliases": ["ACTIV 4T 12x1L"]}, {"code": "3439391", "name": "ACTIV 4T 20W40 12X0.8L R", "category": "MCO", "subcat": "ACTIV 4T", "liters": 9.6, "initStock": 3929, "aliases": ["ACTIV 4T 12x0.8L"]}, {"code": "3438918", "name": "ACTIV AT 20W40 12X0.8L SN R", "category": "MCO", "subcat": "ACTIV SCT", "liters": 9.6, "initStock": 482, "aliases": ["ACTIV AT \u0e40\u0e14\u0e35\u0e48\u0e22\u0e27 12x0.8L"]}, {"code": "3442841", "name": "ACTIV AT 20W40+SGO 12X0.92L", "category": "MCO", "subcat": "ACTIV SCT", "liters": 11.0, "initStock": 206, "aliases": ["ACTIV AT \u0e04\u0e39\u0e48 12x0.92L"]}, {"code": "3443672", "name": "EDGE 5W40  1X4P1L R", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "initStock": 0, "aliases": ["EDGE \u0e40\u0e01\u0e4b\u0e07 5/40 5L"]}, {"code": "3443086", "name": "EDGE 5W30 K 1X4P1L R", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "initStock": 79, "aliases": ["EDGE \u0e40\u0e01\u0e4b\u0e07 5/30 5L"]}, {"code": "3442579", "name": "EDGE PU 5W30 1X6P1L_TH", "category": "PCO", "subcat": "EDGE-PU", "liters": 7.0, "initStock": 504, "aliases": ["EDGE PU 5/30 7L"]}, {"code": "3441868", "name": "EDGE 5W40 A3/B4 1X4P1L  +\u0e40\u0e2a\u0e37\u0e49\u0e2d", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "initStock": 58, "aliases": ["EDGE \u0e40\u0e01\u0e4b\u0e07 5/40 5L"]}, {"code": "3442580", "name": "EDGE PU 5W30 12X1L R", "category": "PCO", "subcat": "EDGE-PU", "liters": 12.0, "initStock": 7, "aliases": ["EDGE PU 5/30 12x1L"]}, {"code": "3435735", "name": "GTX 20W50 12x1L 3X H", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 6, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 20/50 12x1L"]}, {"code": "3435736", "name": "GTX 20W50 3X4 L R", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 38, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 20/50 3x4L"]}, {"code": "3438814", "name": "GTX SM 15W40  3X4L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 0, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 15/40 3x4L"]}, {"code": "3438813", "name": "GTX SM 15W40  12X1L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 3, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 15/40 12x1L"]}, {"code": "3440066", "name": "GTX SM PartSyn 10/40  12x1L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 3, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 10/40 PartSyn 12x1L"]}, {"code": "3440067", "name": "GTX SM PartSyn 10/40  3x4L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 96, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 10/40 PartSyn 3x4L"]}, {"code": "3441513", "name": "GTX 0W20 3X4L FS", "category": "PCO", "subcat": "GTX", "liters": 12.0, "initStock": 50, "aliases": ["GTX \u0e40\u0e01\u0e4b\u0e07 0/20 FullSyn 3x4L"]}, {"code": "3439368", "name": "GTX DIESEL 20W50 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 5, "aliases": ["GTX PU 20/50 12x1L"]}, {"code": "3439369", "name": "GTX DIESEL 20W50 3X5L R", "category": "PCO", "subcat": "GTX-PU", "liters": 15.0, "initStock": 18, "aliases": ["GTX PU 20/50 3x5L"]}, {"code": "3439370", "name": "GTX DIESEL 20W50 3X6L", "category": "PCO", "subcat": "GTX-PU", "liters": 18.0, "initStock": 172, "aliases": ["GTX PU 20/50 3x6L"]}, {"code": "3439374", "name": "GTX DIESEL 10W30 3X6P1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "initStock": 90, "aliases": ["GTX PU 10/30 3x7L"]}, {"code": "3436261", "name": "GTX DIESEL 15W40 3 x 6P1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "initStock": 2, "aliases": ["GTX PU 15/40 3x7L"]}, {"code": "3439373", "name": "GTX DIESEL 10W30 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 0, "aliases": ["GTX PU 10/30 12x1L"]}, {"code": "3436260", "name": "GTX DIESEL 15W40 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 3, "aliases": ["GTX PU 15/40 12x1L"]}, {"code": "3440858", "name": "GTX  DIESEL PartSyn 10/30  3 x 7L", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "initStock": 128, "aliases": ["GTX PU 10/30 PartSyn 3x7L"]}, {"code": "3440857", "name": "GTX  DIESEL  PartSyn 10/30 12x1L", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 6, "aliases": ["GTX PU 10/30 PartSyn 12x1L"]}, {"code": "3440548", "name": "GTX DS  PartSyn 15W40 3X6P1L", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "initStock": 11, "aliases": ["GTX PU 15/40 PartSyn 3x7L"]}, {"code": "3440547", "name": "GTX DS PartSyn 15W40 12X1L", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 1, "aliases": ["GTX PU 15/40 PartSyn 12x1L"]}, {"code": "3442545", "name": "GTX DS 10W40 3X6P1L FS_TH", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "initStock": 64, "aliases": ["GTX PU 10/40 FullSyn 3x7L"]}, {"code": "3442544", "name": "GTX DS 10W40 12X1L FS_TH", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "initStock": 8, "aliases": ["GTX PU 10/40 FullSyn 12x1L"]}, {"code": "3435674", "name": "MAGNATEC SUV 5W30 1X4LF1 R", "category": "PCO", "subcat": "MAG", "liters": 5.0, "initStock": 4, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/30 SUV 5L"]}, {"code": "3440277", "name": "MAGNATEC 10W30 3X4L", "category": "PCO", "subcat": "MAG", "liters": 12.0, "initStock": 44, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 10/30 3x4L"]}, {"code": "3440000", "name": "MAGNATEC 10W40 3X4L R", "category": "PCO", "subcat": "MAG", "liters": 12.0, "initStock": 88, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 10/40 3x4L"]}, {"code": "3440397", "name": "MAGNATEC 0W20  1X3.5L R", "category": "PCO", "subcat": "MAG", "liters": 3.5, "initStock": 141, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 0/20 3.5L"]}, {"code": "3440398", "name": "MAGNATEC 0W20  1X3.5F1 R", "category": "PCO", "subcat": "MAG", "liters": 4.5, "initStock": 130, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 0/20 4.5L"]}, {"code": "3440309", "name": "MAG 5W30 3X4L_TH", "category": "PCO", "subcat": "MAG", "liters": 12.0, "initStock": 51, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/30 FullSyn 3x4L"]}, {"code": "3442039", "name": "MAGNATEC 5W30 3X4L R \u0e23\u0e38\u0e48\u0e19\u0e04\u0e39\u0e1b\u0e2d\u0e07", "category": "PCO", "subcat": "MAG", "liters": 12.0, "initStock": 0, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/30 FullSyn 3x4L"]}, {"code": "3440122", "name": "MAGNATEC FS 5W40 3X4L", "category": "PCO", "subcat": "MAG", "liters": 12.0, "initStock": 0, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/40 FullSyn 3x4L"]}, {"code": "3441429", "name": "MAGNATEC 10W-40 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 239, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 10/40 3x4+1L"]}, {"code": "3441414", "name": "MAGNATEC 10W30 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 90, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 10/30 3x4+1L"]}, {"code": "3441464", "name": "MAGNATEC 5W-40 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 3, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/40 FullSyn 3x4+1L"]}, {"code": "3442229", "name": "MAG 5W30 3X4P1L_TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 31, "aliases": ["MAG \u0e40\u0e01\u0e4b\u0e07 5/30 FullSyn 3x4+1L"]}, {"code": "3442680", "name": "MAG 5W-40 3X4P1L +\u0e40\u0e2a\u0e37\u0e49\u0e2d", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 5, "aliases": []}, {"code": "3442677", "name": "MAG 5W-30 3X4P1L +\u0e40\u0e2a\u0e37\u0e49\u0e2d", "category": "PCO", "subcat": "MAG", "liters": 15.0, "initStock": 67, "aliases": []}, {"code": "3435551", "name": "MAGNATEC PU 10W30 12x1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "initStock": 36, "aliases": ["MAG PU 10/30 12x1L"]}, {"code": "3435938", "name": "MAGNATEC PU 15W40 12x1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "initStock": 10, "aliases": ["MAG PU 15/40 12x1L"]}, {"code": "3443916", "name": "MAG PU 5W30 12X1L_TH", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "initStock": 9, "aliases": ["MAG PU 5/30 FullSyn 12x1L"]}, {"code": "3442487", "name": "MAG PU 10W-30_PS_CK4_12X1L", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "initStock": 0, "aliases": ["MAG PU 10/30 CK-4 12x1L"]}, {"code": "3439623", "name": "MAGNATEC PU 15W40 3X5L", "category": "PCO", "subcat": "MAG-PU", "liters": 15.0, "initStock": 20, "aliases": ["MAG PU 15/40 3x5L"]}, {"code": "3439624", "name": "MAGNATEC PU 15W40 3X6P1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 388, "aliases": ["MAG PU 15/40 3x7L"]}, {"code": "3439595", "name": "MAGNATEC PU 10W30 3X6P1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 596, "aliases": ["MAG PU 10/30 3x7L"]}, {"code": "3442488", "name": "MAGNATEC PU 10W30 CK-4 3X6F1L", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 73, "aliases": ["MAG PU 10/30 CK-4 3x7L"]}, {"code": "3440027", "name": "MAG PU FS 5W30 7L", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 25, "aliases": ["MAG PU 5/30 FullSyn 3x7L"]}, {"code": "3442830", "name": "MAG PU 5W-30 3X6P1L +\u0e40\u0e2a\u0e37\u0e49\u0e2d", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 59, "aliases": []}, {"code": "3443919", "name": "MAG PU 5W-30_3X6P1L_PRO2_TH", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 130, "aliases": []}, {"code": "3443917", "name": "MAG PU FS 5W30 7L (new spec)", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "initStock": 0, "aliases": ["MAG PU 5/30 FullSyn 3x7L"]}, {"code": "3429392", "name": "VISCO 3000 10W40 12X1L HL", "category": "PCO", "subcat": "V-3000", "liters": 12.0, "initStock": 0, "aliases": ["BP \u0e40\u0e01\u0e4b\u0e07 10/40 12x1L"]}, {"code": "3429393", "name": "VISCO 3000 10W40 3X4L HL", "category": "PCO", "subcat": "V-3000", "liters": 12.0, "initStock": 10, "aliases": ["BP \u0e40\u0e01\u0e4b\u0e07 10/40 3x4L"]}, {"code": "3429390", "name": "VISCO PU 3000 15W40 12X1L HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 12.0, "initStock": 0, "aliases": ["BP PU 15/40 12x1L"]}, {"code": "3429388", "name": "VISCO PU 3000 10W30 12X1L HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 12.0, "initStock": 0, "aliases": ["BP PU 10/30 12x1L"]}, {"code": "3429391", "name": "VISCO PU 3000 15W40 3X6F1 HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 21.0, "initStock": 94, "aliases": ["BP PU 15/40 3x7L"]}, {"code": "3429389", "name": "VISCO PU 3000 10W30 3X6LF1HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 21.0, "initStock": 39, "aliases": ["BP PU 10/30 3x7L"]}, {"code": "3436193", "name": "CRB MONOGRADE 40 CF 18L.", "category": "PCO", "subcat": "CRB 40", "liters": 18.0, "initStock": 2, "aliases": ["CRB #40 18L"]}, {"code": "3436195", "name": "CRB MONOGRADE 40 CF 12X1L R", "category": "PCO", "subcat": "CRB 40", "liters": 12.0, "initStock": 12, "aliases": ["CRB #40 12x1L"]}, {"code": "3436196", "name": "CRB MONOGRADE 40 CF 4X5L R", "category": "PCO", "subcat": "CRB 40", "liters": 20.0, "initStock": 43, "aliases": ["CRB #40 4x5L"]}, {"code": "3436226", "name": "CRB TM 15W40 CH4 18L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 18.0, "initStock": 70, "aliases": ["CRB 15/40 18L"]}, {"code": "3436197", "name": "CRB TM 20W50 CH4 18L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 18.0, "initStock": 21, "aliases": ["CRB 20/50 18L"]}, {"code": "3436199", "name": "CRB TM 20W50 CH4 12X1L. HL", "category": "PCO", "subcat": "CRB TURBO", "liters": 12.0, "initStock": 4, "aliases": ["CRB 20/50 12x1L"]}, {"code": "3436228", "name": "CRB TM 15W40 CH4 12X1L HL", "category": "PCO", "subcat": "CRB TURBO", "liters": 12.0, "initStock": 3, "aliases": ["CRB 15/40 12x1L"]}, {"code": "3436229", "name": "CRB TM 15W40 CH4 3X6P1L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 21.0, "initStock": 176, "aliases": ["CRB 15/40 3x7L"]}, {"code": "3436200", "name": "CRB TM 20W50 CH4 3X6P1L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 21.0, "initStock": 218, "aliases": ["CRB 20/50 3x7L"]}, {"code": "3435963", "name": "BRAKE FLUID DOT 3 24x0.5 LT", "category": "PCO", "subcat": "BRAKE", "liters": 12.0, "initStock": 15, "aliases": ["Brake DOT 3 24x0.5L"]}, {"code": "3436246", "name": "BRAKE FLUID DOT 4 24x0.5 LT", "category": "PCO", "subcat": "BRAKE", "liters": 12.0, "initStock": 7, "aliases": ["Brake DOT 4 24x0.5L"]}, {"code": "3436215", "name": "RADICOOL 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "initStock": 49, "aliases": ["RADICOOL 12x1L"]}, {"code": "3436174", "name": "RADICOOL SF PREMIX 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "initStock": 36, "aliases": ["RADICOOL PREMIX 12x1L"]}, {"code": "3436175", "name": "RADICOOL SF PREMIX 6X4 L R", "category": "PCO", "subcat": "COOLANT", "liters": 24.0, "initStock": 15, "aliases": ["RADICOOL PREMIX 6x4L"]}, {"code": "3440917", "name": "RADICOOL SF PREMIX \u0e40\u0e02\u0e35\u0e22\u0e27 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "initStock": 5, "aliases": ["RADICOOL PREMIX \u0e40\u0e02\u0e35\u0e22\u0e27 12x1L"]}, {"code": "3440918", "name": "RADICOOL SF PREMIX \u0e40\u0e02\u0e35\u0e22\u0e27 6X4L", "category": "PCO", "subcat": "COOLANT", "liters": 24.0, "initStock": 4, "aliases": ["RADICOOL PREMIX \u0e40\u0e02\u0e35\u0e22\u0e27 6x4L"]}, {"code": "3435957", "name": "TRANSMAX ATF D/M M 4X5 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 20.0, "initStock": 3, "aliases": ["ATF 4x5L"]}, {"code": "3436002", "name": "Transmax CVT 12x1 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "initStock": 13, "aliases": ["CVT 12x1L"]}, {"code": "3435956", "name": "Transmax ATF D/M M 12x1 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "initStock": 82, "aliases": ["ATF 12x1L"]}, {"code": "3442714", "name": "TRANSMAX ATF D.VI M. LV 3x4 L H", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "initStock": 27, "aliases": ["Dexron 6 3x4L"]}, {"code": "3437350", "name": "TRANSMAX MANUAL 75W85 18L", "category": "PCO", "subcat": "AUTO TRAN", "liters": 18.0, "initStock": 7, "aliases": ["Transmax 75/85 18L"]}, {"code": "3435967", "name": "TRANSMAX LMT S Z85W90 12x1 R", "category": "PCO", "subcat": "MANL TRAN", "liters": 12.0, "initStock": 8, "aliases": ["Limited Slip Z 85/90 12x1L"]}, {"code": "3436120", "name": "Transmax M T 75W90 12x1 L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 12.0, "initStock": 8, "aliases": ["Transmax 75/90 12x1L"]}, {"code": "3435968", "name": "TRANSMAX MANUAL 80W90 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "initStock": 27, "aliases": ["GL-4 #90 18L"]}, {"code": "3435971", "name": "TRANSMAX MANUAL 85W140 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "initStock": 13, "aliases": ["GL-4 #140 18L"]}, {"code": "3435977", "name": "TRANSMAX AXLE 80W90 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "initStock": 112, "aliases": ["GL-5 #90 18L"]}, {"code": "3435974", "name": "TRANSMAX AXLE 85W-140 18 L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "initStock": 21, "aliases": ["GL-5 #140 18L"]}, {"code": "3435979", "name": "TRANSMAX AXLE 80W90 4X5L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "initStock": 24, "aliases": ["GL-5 #90 4x5L"]}, {"code": "3435976", "name": "TRANSMAX AXLE 85W140 4X5L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "initStock": 16, "aliases": ["GL-5 #140 4x5L"]}, {"code": "3435970", "name": "TRANSMAX M 80W90 4X5 L HL", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "initStock": 51, "aliases": ["GL-4 #90 4x5L"]}, {"code": "3435973", "name": "TRANSMAX MANUAL 85W140 4X5LR", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "initStock": 2, "aliases": ["GL-4 #140 4x5L"]}, {"code": "3345353", "name": "SPHEEROL  EPL. 0  15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "initStock": 6, "aliases": []}, {"code": "3345343", "name": "SPHEEROL EPL. 2 15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "initStock": 1, "aliases": ["EPL.2 15kg"]}, {"code": "3345344", "name": "SPHEEROL EPL. 3 15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "initStock": 1, "aliases": ["EPL.3 15kg"]}, {"code": "3345346", "name": "SPHEEROL EPL 3  24X500GM R", "category": "PCO", "subcat": "GREASE", "liters": 12.0, "initStock": 0, "aliases": ["EPL.3 24x500g"]}, {"code": "3436171", "name": "MOLY GREASE 24X500GM R", "category": "PCO", "subcat": "GREASE", "liters": 12.0, "initStock": 0, "aliases": ["MOLY GREASE 24x500g"]}, {"code": "3436805", "name": "FLUSHING OIL 6X4 L", "category": "PCO", "subcat": "OTHER", "liters": 24.0, "initStock": 9, "aliases": ["Flushing Oil 6x4L"]}, {"code": "3810059", "name": "\u0e44\u0e2e\u0e2a\u0e1b\u0e34\u0e19 AWS 32 1x18 LT", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "initStock": 17, "aliases": ["HYSPIN 32 18L"]}, {"code": "3810063", "name": "\u0e44\u0e2e\u0e2a\u0e1b\u0e34\u0e19 AWS 68 1x18 LT", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "initStock": 10, "aliases": ["HYSPIN 68 18L"]}, {"code": "3436264", "name": "TRANS AGRI TRANS P 80W 18L R", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "initStock": 7, "aliases": ["AGRI 80W 18L"]}, {"code": "3436205", "name": "ENGINE SHAMPOO 6X0.3 L", "category": "PCO", "subcat": "OTHER", "liters": 1.8, "initStock": 14, "aliases": ["Shampoo \u0e40\u0e1a\u0e19\u0e0b\u0e34\u0e19 6x300ml"]}, {"code": "3436204", "name": "ENGINE SHAMPOO DS 6X0.3L R", "category": "PCO", "subcat": "OTHER", "liters": 1.8, "initStock": 15, "aliases": ["Shampoo \u0e14\u0e35\u0e40\u0e0b\u0e25 6x300ml"]}, {"code": "3435567", "name": "OUTBOARD 2T  12X1L R", "category": "PCO", "subcat": "OUTBOARD", "liters": 12.0, "initStock": 0, "aliases": ["OUTBOARD 12x1L"]}, {"code": "3435981", "name": "SCOOTER GEAR 80W90 12X 0.12L R", "category": "PCO", "subcat": "SCT GEAR", "liters": 1.44, "initStock": 23, "aliases": ["SCOOTER GEAR OIL 12x0.12L"]}];
+  const SEED_PRODUCTS=[{"code": "3429277", "name": "GO!2T 12X1L. HL", "category": "MCO", "subcat": "2T-GO", "liters": 12.0, "unitsPerCase": 12, "price": 1126.78, "initStock": 527, "aliases": ["GO 2T 12x1L"]}, {"code": "3429278", "name": "GO!2T 12X0.5L. HL", "category": "MCO", "subcat": "2T-GO", "liters": 6.0, "unitsPerCase": 12, "price": 674.08, "initStock": 237, "aliases": ["GO 2T 12x0.5L"]}, {"code": "3435677", "name": "ACTIV ES. SAE 40   12 X 0.7L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 8.4, "unitsPerCase": 12, "price": 800.88, "initStock": 110, "aliases": ["ACTIV ESS 12x0.7L"]}, {"code": "3435678", "name": "ACTIV ES. SAE 40   12 X 0.8L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 9.6, "unitsPerCase": 12, "price": 917.44, "initStock": 447, "aliases": ["ACTIV ESS 12x0.8L"]}, {"code": "3435676", "name": "ACTIV ES. SAE 40   12 X 1L.", "category": "MCO", "subcat": "ACTIV ESS", "liters": 12.0, "unitsPerCase": 12, "price": 1107.32, "initStock": 38, "aliases": ["ACTIV ESS 12x1L"]}, {"code": "3440370", "name": "POWER1 UL 4T 10W30(FS) 12X1L", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "unitsPerCase": 12, "price": 2704.52, "initStock": 0, "aliases": ["PW1 UL 10/30 12x1L"]}, {"code": "3440367", "name": "POWER1 UL 10W40 4T 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "unitsPerCase": 12, "price": 2704.52, "initStock": 10, "aliases": ["PW1 UL 10/40 12x1L"]}, {"code": "3440258", "name": "POWER1 UL 10W50 4T 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "unitsPerCase": 12, "price": 2704.52, "initStock": 10, "aliases": ["PW1 UL 10/50 12x1L"]}, {"code": "3440472", "name": "POWER1 ULT AUTO 5W40 12X1L R", "category": "MCO", "subcat": "4T-PW ULTIMATE", "liters": 12.0, "unitsPerCase": 12, "price": 2704.52, "initStock": 8, "aliases": ["PW1 UL 5/40 12x1L"]}, {"code": "3439375", "name": "POWER1 4T 10W30 12x1L R", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "unitsPerCase": 12, "price": 1585.65, "initStock": 33, "aliases": ["PW1 4T 12x1L"]}, {"code": "3439376", "name": "POWER1 4T 10W30 12x0.8L R", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "unitsPerCase": 12, "price": 1314.09, "initStock": 233, "aliases": ["PW1 4T 12x0.8L"]}, {"code": "3438928", "name": "POWER1 AT 10W40 12X0.8L SP R", "category": "MCO", "subcat": "4T-PW SCT", "liters": 9.6, "unitsPerCase": 12, "price": 1533.57, "initStock": 5, "aliases": ["PW1 AT เดี่ยว 12x0.8L"]}, {"code": "3442715", "name": "POWER1 AT 10W40+SGO 12X0.92L", "category": "MCO", "subcat": "4T-PW SCT", "liters": 11.0, "unitsPerCase": 12, "price": 1783.74, "initStock": 111, "aliases": ["PW1 AT คู่ 12x0.92L"]}, {"code": "3442231", "name": "POWER1 4T 10W40  ใหม่ 12x1L", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "unitsPerCase": 12, "price": 1585.65, "initStock": 54, "aliases": ["PW1 4T 10/40 ใหม่ 12x1L"]}, {"code": "3442232", "name": "POWER1 4T 10W40  ใหม่ 12x0.8L", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "unitsPerCase": 12, "price": 1314.09, "initStock": 75, "aliases": ["PW1 4T 10/40 ใหม่ 12x0.8L"]}, {"code": "3442108", "name": "POWER1 AUTO 10W30 12X0.8L N", "category": "MCO", "subcat": "4T-PW SCT", "liters": 9.6, "unitsPerCase": 12, "price": 1533.57, "initStock": 19, "aliases": ["PW1 AT คู่ 10/30 ใหม่ 6x0.92L"]}, {"code": "3442330", "name": "POWER1 AT 10W30+SGO 6X0.92L N", "category": "MCO", "subcat": "4T-PW SCT", "liters": 5.5, "unitsPerCase": 6, "price": 891.87, "initStock": 32, "aliases": ["PW1 AT เดี่ยว 10/30 ใหม่ 12x0.8L"]}, {"code": "3444620", "name": "POWER1 4T 10W-30 12X1L (รุ่นแถมเสื้อ)", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "unitsPerCase": 12, "price": 1585.65, "initStock": 59, "aliases": ["PW1 4T 12x1L"]}, {"code": "3444621", "name": "POWER1 4T 10W-30 12X0.8L(รุ่นแถมเสื้อ)", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "unitsPerCase": 12, "price": 1314.09, "initStock": 161, "aliases": ["PW1 4T 12x0.8L"]}, {"code": "3441679", "name": "POWER1 4T 10W-40  12X1L (รุ่นแถมเสื้อ)", "category": "MCO", "subcat": "4T-PW", "liters": 12.0, "unitsPerCase": 12, "price": 1585.65, "initStock": 5, "aliases": ["PW1 4T 10/40 ใหม่ 12x1L"]}, {"code": "3441680", "name": "POWER1 4T 10W-40 12X0.8L (รุ่นแถมเสื้อ)", "category": "MCO", "subcat": "4T-PW", "liters": 9.6, "unitsPerCase": 12, "price": 1314.09, "initStock": 8, "aliases": ["PW1 4T 10/40 ใหม่ 12x0.8L"]}, {"code": "3439390", "name": "ACTIV 4T 20W40 12X1L R", "category": "MCO", "subcat": "ACTIV 4T", "liters": 12.0, "unitsPerCase": 12, "price": 1212.6, "initStock": 506, "aliases": ["ACTIV 4T 12x1L"]}, {"code": "3439391", "name": "ACTIV 4T 20W40 12X0.8L R", "category": "MCO", "subcat": "ACTIV 4T", "liters": 9.6, "unitsPerCase": 12, "price": 1022.72, "initStock": 3929, "aliases": ["ACTIV 4T 12x0.8L"]}, {"code": "3438918", "name": "ACTIV AT 20W40 12X0.8L SN R", "category": "MCO", "subcat": "ACTIV SCT", "liters": 9.6, "unitsPerCase": 12, "price": 1147.62, "initStock": 482, "aliases": ["ACTIV AT เดี่ยว 12x0.8L"]}, {"code": "3442841", "name": "ACTIV AT 20W40+SGO 12X0.92L", "category": "MCO", "subcat": "ACTIV SCT", "liters": 11.0, "unitsPerCase": 12, "price": 1397.79, "initStock": 206, "aliases": ["ACTIV AT คู่ 12x0.92L"]}, {"code": "3443672", "name": "EDGE 5W40  1X4P1L R", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "unitsPerCase": 1, "price": 1704.43, "initStock": 0, "aliases": ["EDGE เก๋ง 5/40 5L"]}, {"code": "3443086", "name": "EDGE 5W30 K 1X4P1L R", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "unitsPerCase": 1, "price": 1704.43, "initStock": 79, "aliases": ["EDGE เก๋ง 5/30 5L"]}, {"code": "3442579", "name": "EDGE PU 5W30 1X6P1L_TH", "category": "PCO", "subcat": "EDGE-PU", "liters": 7.0, "unitsPerCase": 1, "price": 1688.05, "initStock": 504, "aliases": ["EDGE PU 5/30 7L"]}, {"code": "3441868", "name": "EDGE 5W40 A3/B4 1X4P1L  +เสื้อ", "category": "PCO", "subcat": "EDGE", "liters": 5.0, "unitsPerCase": 1, "price": 1704.43, "initStock": 58, "aliases": ["EDGE เก๋ง 5/40 5L"]}, {"code": "3442580", "name": "EDGE PU 5W30 12X1L R", "category": "PCO", "subcat": "EDGE-PU", "liters": 12.0, "unitsPerCase": 12, "price": 3633.63, "initStock": 7, "aliases": ["EDGE PU 5/30 12x1L"]}, {"code": "3435735", "name": "GTX 20W50 12x1L 3X H", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 12, "price": 1495.54, "initStock": 6, "aliases": ["GTX เก๋ง 20/50 12x1L"]}, {"code": "3435736", "name": "GTX 20W50 3X4 L R", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 3, "price": 1318.82, "initStock": 38, "aliases": ["GTX เก๋ง 20/50 3x4L"]}, {"code": "3438814", "name": "GTX SM 15W40  3X4L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 3, "price": 1318.82, "initStock": 0, "aliases": ["GTX เก๋ง 15/40 3x4L"]}, {"code": "3438813", "name": "GTX SM 15W40  12X1L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 12, "price": 1495.54, "initStock": 3, "aliases": ["GTX เก๋ง 15/40 12x1L"]}, {"code": "3440066", "name": "GTX SM PartSyn 10/40  12x1L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 12, "price": 1697.64, "initStock": 3, "aliases": ["GTX เก๋ง 10/40 PartSyn 12x1L"]}, {"code": "3440067", "name": "GTX SM PartSyn 10/40  3x4L", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 3, "price": 1581.08, "initStock": 96, "aliases": ["GTX เก๋ง 10/40 PartSyn 3x4L"]}, {"code": "3441513", "name": "GTX 0W20 3X4L FS", "category": "PCO", "subcat": "GTX", "liters": 12.0, "unitsPerCase": 3, "price": 2298.3, "initStock": 50, "aliases": ["GTX เก๋ง 0/20 FullSyn 3x4L"]}, {"code": "3439368", "name": "GTX DIESEL 20W50 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 1305.99, "initStock": 5, "aliases": ["GTX PU 20/50 12x1L"]}, {"code": "3439369", "name": "GTX DIESEL 20W50 3X5L R", "category": "PCO", "subcat": "GTX-PU", "liters": 15.0, "unitsPerCase": 3, "price": 1461.19, "initStock": 18, "aliases": ["GTX PU 20/50 3x5L"]}, {"code": "3439370", "name": "GTX DIESEL 20W50 3X6L", "category": "PCO", "subcat": "GTX-PU", "liters": 18.0, "unitsPerCase": 3, "price": 1653.28, "initStock": 172, "aliases": ["GTX PU 20/50 3x6L"]}, {"code": "3439374", "name": "GTX DIESEL 10W30 3X6P1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "unitsPerCase": 3, "price": 1871.72, "initStock": 90, "aliases": ["GTX PU 10/30 3x7L"]}, {"code": "3436261", "name": "GTX DIESEL 15W40 3 x 6P1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "unitsPerCase": 3, "price": 1892.22, "initStock": 2, "aliases": ["GTX PU 15/40 3x7L"]}, {"code": "3439373", "name": "GTX DIESEL 10W30 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 1211.12, "initStock": 0, "aliases": ["GTX PU 10/30 12x1L"]}, {"code": "3436260", "name": "GTX DIESEL 15W40 12X1L R", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 1233.28, "initStock": 3, "aliases": ["GTX PU 15/40 12x1L"]}, {"code": "3440858", "name": "GTX  DIESEL PartSyn 10/30  3 x 7L", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2076.46, "initStock": 128, "aliases": ["GTX PU 10/30 PartSyn 3x7L"]}, {"code": "3440857", "name": "GTX  DIESEL  PartSyn 10/30 12x1L", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 1380.86, "initStock": 6, "aliases": ["GTX PU 10/30 PartSyn 12x1L"]}, {"code": "3440548", "name": "GTX DS  PartSyn 15W40 3X6P1L", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2076.46, "initStock": 11, "aliases": ["GTX PU 15/40 PartSyn 3x7L"]}, {"code": "3440547", "name": "GTX DS PartSyn 15W40 12X1L", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 1380.86, "initStock": 1, "aliases": ["GTX PU 15/40 PartSyn 12x1L"]}, {"code": "3442545", "name": "GTX DS 10W40 3X6P1L FS_TH", "category": "PCO", "subcat": "GTX-PU", "liters": 21.0, "unitsPerCase": 3, "price": 3283.42, "initStock": 64, "aliases": ["GTX PU 10/40 FullSyn 3x7L"]}, {"code": "3442544", "name": "GTX DS 10W40 12X1L FS_TH", "category": "PCO", "subcat": "GTX-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2709.0, "initStock": 8, "aliases": ["GTX PU 10/40 FullSyn 12x1L"]}, {"code": "3435674", "name": "MAGNATEC SUV 5W30 1X4LF1 R", "category": "PCO", "subcat": "MAG", "liters": 5.0, "unitsPerCase": 1, "price": 1318.36, "initStock": 4, "aliases": ["MAG เก๋ง 5/30 SUV 5L"]}, {"code": "3440277", "name": "MAGNATEC 10W30 3X4L", "category": "PCO", "subcat": "MAG", "liters": 12.0, "unitsPerCase": 3, "price": 2573.31, "initStock": 44, "aliases": ["MAG เก๋ง 10/30 3x4L"]}, {"code": "3440000", "name": "MAGNATEC 10W40 3X4L R", "category": "PCO", "subcat": "MAG", "liters": 12.0, "unitsPerCase": 3, "price": 2573.31, "initStock": 88, "aliases": ["MAG เก๋ง 10/40 3x4L"]}, {"code": "3440397", "name": "MAGNATEC 0W20  1X3.5L R", "category": "PCO", "subcat": "MAG", "liters": 3.5, "unitsPerCase": 1, "price": 847.32, "initStock": 141, "aliases": ["MAG เก๋ง 0/20 3.5L"]}, {"code": "3440398", "name": "MAGNATEC 0W20  1X3.5F1 R", "category": "PCO", "subcat": "MAG", "liters": 4.5, "unitsPerCase": 1, "price": 975.2, "initStock": 130, "aliases": ["MAG เก๋ง 0/20 4.5L"]}, {"code": "3440309", "name": "MAG 5W30 3X4L_TH", "category": "PCO", "subcat": "MAG", "liters": 12.0, "unitsPerCase": 3, "price": 2914.56, "initStock": 51, "aliases": ["MAG เก๋ง 5/30 FullSyn 3x4L"]}, {"code": "3442039", "name": "MAGNATEC 5W30 3X4L R รุ่นคูปอง", "category": "PCO", "subcat": "MAG", "liters": 12.0, "unitsPerCase": 3, "price": 2914.56, "initStock": 0, "aliases": ["MAG เก๋ง 5/30 FullSyn 3x4L"]}, {"code": "3440122", "name": "MAGNATEC FS 5W40 3X4L", "category": "PCO", "subcat": "MAG", "liters": 12.0, "unitsPerCase": 3, "price": 2914.56, "initStock": 0, "aliases": ["MAG เก๋ง 5/40 FullSyn 3x4L"]}, {"code": "3441429", "name": "MAGNATEC 10W-40 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 2675.61, "initStock": 239, "aliases": ["MAG เก๋ง 10/40 3x4+1L"]}, {"code": "3441414", "name": "MAGNATEC 10W30 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 2675.61, "initStock": 90, "aliases": ["MAG เก๋ง 10/30 3x4+1L"]}, {"code": "3441464", "name": "MAGNATEC 5W-40 3X4L+1L TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 3023.12, "initStock": 3, "aliases": ["MAG เก๋ง 5/40 FullSyn 3x4+1L"]}, {"code": "3442229", "name": "MAG 5W30 3X4P1L_TH", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 3023.12, "initStock": 31, "aliases": ["MAG เก๋ง 5/30 FullSyn 3x4+1L"]}, {"code": "3442680", "name": "MAG 5W-40 3X4P1L +เสื้อ", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 3023.12, "initStock": 5, "aliases": []}, {"code": "3442677", "name": "MAG 5W-30 3X4P1L +เสื้อ", "category": "PCO", "subcat": "MAG", "liters": 15.0, "unitsPerCase": 3, "price": 3023.12, "initStock": 67, "aliases": []}, {"code": "3435551", "name": "MAGNATEC PU 10W30 12x1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2471.94, "initStock": 36, "aliases": ["MAG PU 10/30 12x1L"]}, {"code": "3435938", "name": "MAGNATEC PU 15W40 12x1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2471.94, "initStock": 10, "aliases": ["MAG PU 15/40 12x1L"]}, {"code": "3443916", "name": "MAG PU 5W30 12X1L_TH", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2672.6, "initStock": 9, "aliases": ["MAG PU 5/30 FullSyn 12x1L"]}, {"code": "3442487", "name": "MAG PU 10W-30_PS_CK4_12X1L", "category": "PCO", "subcat": "MAG-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2628.18, "initStock": 0, "aliases": ["MAG PU 10/30 CK-4 12x1L"]}, {"code": "3439623", "name": "MAGNATEC PU 15W40 3X5L", "category": "PCO", "subcat": "MAG-PU", "liters": 15.0, "unitsPerCase": 3, "price": 2252.46, "initStock": 20, "aliases": ["MAG PU 15/40 3x5L"]}, {"code": "3439624", "name": "MAGNATEC PU 15W40 3X6P1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2990.88, "initStock": 388, "aliases": ["MAG PU 15/40 3x7L"]}, {"code": "3439595", "name": "MAGNATEC PU 10W30 3X6P1L R", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2990.88, "initStock": 596, "aliases": ["MAG PU 10/30 3x7L"]}, {"code": "3442488", "name": "MAGNATEC PU 10W30 CK-4 3X6F1L", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 3, "price": 3076.44, "initStock": 73, "aliases": ["MAG PU 10/30 CK-4 3x7L"]}, {"code": "3440027", "name": "MAG PU FS 5W30 7L", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 1, "price": 3530.96, "initStock": 25, "aliases": ["MAG PU 5/30 FullSyn 3x7L"]}, {"code": "3442830", "name": "MAG PU 5W-30 3X6P1L +เสื้อ", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 3, "price": 3530.96, "initStock": 59, "aliases": []}, {"code": "3443919", "name": "MAG PU 5W-30_3X6P1L_PRO2_TH (new spec รุ่นแถมเสื้อ)", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 3, "price": 3530.96, "initStock": 130, "aliases": []}, {"code": "3443917", "name": "MAG PU FS 5W30 7L  (new spec)", "category": "PCO", "subcat": "MAG-PU", "liters": 21.0, "unitsPerCase": 1, "price": 3530.96, "initStock": 0, "aliases": ["MAG PU 5/30 FullSyn 3x7L"]}, {"code": "3429392", "name": "VISCO 3000 10W40 12X1L HL", "category": "PCO", "subcat": "V-3000", "liters": 12.0, "unitsPerCase": 12, "price": 2276.68, "initStock": 0, "aliases": ["BP เก๋ง 10/40 12x1L"]}, {"code": "3429393", "name": "VISCO 3000 10W40 3X4L HL", "category": "PCO", "subcat": "V-3000", "liters": 12.0, "unitsPerCase": 3, "price": 2082.1, "initStock": 10, "aliases": ["BP เก๋ง 10/40 3x4L"]}, {"code": "3429390", "name": "VISCO PU 3000 15W40 12X1L HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2076.46, "initStock": 0, "aliases": ["BP PU 15/40 12x1L"]}, {"code": "3429388", "name": "VISCO PU 3000 10W30 12X1L HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 12.0, "unitsPerCase": 12, "price": 2076.46, "initStock": 0, "aliases": ["BP PU 10/30 12x1L"]}, {"code": "3429391", "name": "VISCO PU 3000 15W40 3X6F1 HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2569.96, "initStock": 94, "aliases": ["BP PU 15/40 3x7L"]}, {"code": "3429389", "name": "VISCO PU 3000 10W30 3X6LF1HL", "category": "PCO", "subcat": "V-3000-PU", "liters": 21.0, "unitsPerCase": 3, "price": 2625.42, "initStock": 39, "aliases": ["BP PU 10/30 3x7L"]}, {"code": "3436193", "name": "CRB MONOGRADE 40 CF 18L.", "category": "PCO", "subcat": "CRB 40", "liters": 18.0, "unitsPerCase": 1, "price": 1480.5, "initStock": 2, "aliases": ["CRB #40 18L"]}, {"code": "3436195", "name": "CRB MONOGRADE 40 CF 12X1L R", "category": "PCO", "subcat": "CRB 40", "liters": 12.0, "unitsPerCase": 12, "price": 1065.96, "initStock": 12, "aliases": ["CRB #40 12x1L"]}, {"code": "3436196", "name": "CRB MONOGRADE 40 CF 4X5L R", "category": "PCO", "subcat": "CRB 40", "liters": 20.0, "unitsPerCase": 4, "price": 1645.0, "initStock": 43, "aliases": ["CRB #40 4x5L"]}, {"code": "3436226", "name": "CRB TM 15W40 CH4 18L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 18.0, "unitsPerCase": 1, "price": 2052.02, "initStock": 70, "aliases": ["CRB 15/40 18L"]}, {"code": "3436197", "name": "CRB TM 20W50 CH4 18L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 18.0, "unitsPerCase": 1, "price": 2012.54, "initStock": 21, "aliases": ["CRB 20/50 18L"]}, {"code": "3436199", "name": "CRB TM 20W50 CH4 12X1L. HL", "category": "PCO", "subcat": "CRB TURBO", "liters": 12.0, "unitsPerCase": 12, "price": 1455.12, "initStock": 4, "aliases": ["CRB 20/50 12x1L"]}, {"code": "3436228", "name": "CRB TM 15W40 CH4 12X1L HL", "category": "PCO", "subcat": "CRB TURBO", "liters": 12.0, "unitsPerCase": 12, "price": 1443.84, "initStock": 3, "aliases": ["CRB 15/40 12x1L"]}, {"code": "3436229", "name": "CRB TM 15W40 CH4 3X6P1L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 21.0, "unitsPerCase": 3, "price": 2240.02, "initStock": 176, "aliases": ["CRB 15/40 3x7L"]}, {"code": "3436200", "name": "CRB TM 20W50 CH4 3X6P1L R", "category": "PCO", "subcat": "CRB TURBO", "liters": 21.0, "unitsPerCase": 3, "price": 2163.88, "initStock": 218, "aliases": ["CRB 20/50 3x7L"]}, {"code": "3435963", "name": "BRAKE FLUID DOT 3 24x0.5 LT", "category": "PCO", "subcat": "BRAKE", "liters": 12.0, "unitsPerCase": 24, "price": 1804.8, "initStock": 15, "aliases": ["Brake DOT 3 24x0.5L"]}, {"code": "3436246", "name": "BRAKE FLUID DOT 4 24x0.5 LT", "category": "PCO", "subcat": "BRAKE", "liters": 12.0, "unitsPerCase": 24, "price": 2278.56, "initStock": 7, "aliases": ["Brake DOT 4 24x0.5L"]}, {"code": "3436215", "name": "RADICOOL 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "unitsPerCase": 12, "price": 1556.64, "initStock": 49, "aliases": ["RADICOOL 12x1L"]}, {"code": "3436174", "name": "RADICOOL SF PREMIX 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "unitsPerCase": 12, "price": 1184.4, "initStock": 36, "aliases": ["RADICOOL PREMIX 12x1L"]}, {"code": "3436175", "name": "RADICOOL SF PREMIX 6X4 L R", "category": "PCO", "subcat": "COOLANT", "liters": 24.0, "unitsPerCase": 6, "price": 2278.56, "initStock": 15, "aliases": ["RADICOOL PREMIX 6x4L"]}, {"code": "3440917", "name": "RADICOOL SF PREMIX เขียว 12X1L R", "category": "PCO", "subcat": "COOLANT", "liters": 12.0, "unitsPerCase": 12, "price": 1184.4, "initStock": 5, "aliases": ["RADICOOL PREMIX เขียว 12x1L"]}, {"code": "3440918", "name": "RADICOOL SF PREMIX เขียว 6X4L", "category": "PCO", "subcat": "COOLANT", "liters": 24.0, "unitsPerCase": 6, "price": 2278.56, "initStock": 4, "aliases": ["RADICOOL PREMIX เขียว 6x4L"]}, {"code": "3435957", "name": "TRANSMAX ATF D/M M 4X5 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 20.0, "unitsPerCase": 4, "price": 3099.18, "initStock": 3, "aliases": ["ATF 4x5L"]}, {"code": "3436002", "name": "Transmax CVT 12x1 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "unitsPerCase": 12, "price": 2688.4, "initStock": 13, "aliases": ["CVT 12x1L"]}, {"code": "3435956", "name": "Transmax ATF D/M M 12x1 L R", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "unitsPerCase": 12, "price": 1981.52, "initStock": 82, "aliases": ["ATF 12x1L"]}, {"code": "3442714", "name": "TRANSMAX ATF D.VI M. LV 3x4 L H", "category": "PCO", "subcat": "AUTO TRAN", "liters": 12.0, "unitsPerCase": 3, "price": 3442.28, "initStock": 27, "aliases": ["Dexron 6 3x4L"]}, {"code": "3437350", "name": "TRANSMAX MANUAL 75W85 18L", "category": "PCO", "subcat": "AUTO TRAN", "liters": 18.0, "unitsPerCase": 1, "price": 3697.02, "initStock": 7, "aliases": ["Transmax 75/85 18L"]}, {"code": "3435967", "name": "TRANSMAX LMT S Z85W90 12x1 R", "category": "PCO", "subcat": "MANL TRAN", "liters": 12.0, "unitsPerCase": 12, "price": 1776.6, "initStock": 8, "aliases": ["Limited Slip Z 85/90 12x1L"]}, {"code": "3436120", "name": "Transmax M T 75W90 12x1 L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 12.0, "unitsPerCase": 12, "price": 3458.26, "initStock": 8, "aliases": ["Transmax 75/90 12x1L"]}, {"code": "3435968", "name": "TRANSMAX MANUAL 80W90 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "unitsPerCase": 1, "price": 1739.0, "initStock": 27, "aliases": ["GL-4 #90 18L"]}, {"code": "3435971", "name": "TRANSMAX MANUAL 85W140 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "unitsPerCase": 1, "price": 1739.0, "initStock": 13, "aliases": ["GL-4 #140 18L"]}, {"code": "3435977", "name": "TRANSMAX AXLE 80W90 18L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "unitsPerCase": 1, "price": 1962.72, "initStock": 112, "aliases": ["GL-5 #90 18L"]}, {"code": "3435974", "name": "TRANSMAX AXLE 85W-140 18 L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 18.0, "unitsPerCase": 1, "price": 1962.72, "initStock": 21, "aliases": ["GL-5 #140 18L"]}, {"code": "3435979", "name": "TRANSMAX AXLE 80W90 4X5L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "unitsPerCase": 4, "price": 2259.76, "initStock": 24, "aliases": ["GL-5 #90 4x5L"]}, {"code": "3435976", "name": "TRANSMAX AXLE 85W140 4X5L R", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "unitsPerCase": 4, "price": 2259.76, "initStock": 16, "aliases": ["GL-5 #140 4x5L"]}, {"code": "3435970", "name": "TRANSMAX M 80W90 4X5 L HL", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "unitsPerCase": 4, "price": 2055.78, "initStock": 51, "aliases": ["GL-4 #90 4x5L"]}, {"code": "3435973", "name": "TRANSMAX MANUAL 85W140 4X5LR", "category": "PCO", "subcat": "MANL TRAN", "liters": 20.0, "unitsPerCase": 4, "price": 2055.78, "initStock": 2, "aliases": ["GL-4 #140 4x5L"]}, {"code": "3345353", "name": "SPHEEROL  EPL. 0  15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "unitsPerCase": 1, "price": 4230.0, "initStock": 6, "aliases": []}, {"code": "3345343", "name": "SPHEEROL EPL. 2 15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "unitsPerCase": 1, "price": 4230.0, "initStock": 1, "aliases": ["EPL.2 15kg"]}, {"code": "3345344", "name": "SPHEEROL EPL. 3 15KG.", "category": "PCO", "subcat": "GREASE", "liters": 15.0, "unitsPerCase": 1, "price": 4230.0, "initStock": 1, "aliases": ["EPL.3 15kg"]}, {"code": "3345346", "name": "SPHEEROL EPL 3  24X500GM R", "category": "PCO", "subcat": "GREASE", "liters": 12.0, "unitsPerCase": 24, "price": 4230.0, "initStock": 0, "aliases": ["EPL.3 24x500g"]}, {"code": "3436171", "name": "MOLY GREASE 24X500GM R", "category": "PCO", "subcat": "GREASE", "liters": 12.0, "unitsPerCase": 24, "price": 4653.0, "initStock": 0, "aliases": ["MOLY GREASE 24x500g"]}, {"code": "3436805", "name": "FLUSHING OIL 6X4 L", "category": "PCO", "subcat": "OTHER", "liters": 24.0, "unitsPerCase": 6, "price": 1786.75, "initStock": 9, "aliases": ["Flushing Oil 6x4L"]}, {"code": "3810059", "name": "ไฮสปิน AWS 32 1x18 LT", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "unitsPerCase": 1, "price": 2115.0, "initStock": 17, "aliases": ["HYSPIN 32 18L"]}, {"code": "3810063", "name": "ไฮสปิน AWS 68 1x18 LT", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "unitsPerCase": 1, "price": 2115.0, "initStock": 10, "aliases": ["HYSPIN 68 18L"]}, {"code": "3436264", "name": "TRANS AGRI TRANS P 80W 18L R", "category": "PCO", "subcat": "OTHER", "liters": 18.0, "unitsPerCase": 1, "price": 1751.22, "initStock": 7, "aliases": ["AGRI 80W 18L"]}, {"code": "3436205", "name": "ENGINE SHAMPOO 6X0.3 L", "category": "PCO", "subcat": "OTHER", "liters": 1.8, "unitsPerCase": 6, "price": 1581.08, "initStock": 14, "aliases": ["Shampoo เบนซิน 6x300ml"]}, {"code": "3436204", "name": "ENGINE SHAMPOO DS 6X0.3L R", "category": "PCO", "subcat": "OTHER", "liters": 1.8, "unitsPerCase": 6, "price": 1581.08, "initStock": 15, "aliases": ["Shampoo ดีเซล 6x300ml"]}, {"code": "3435567", "name": "OUTBOARD 2T  12X1L R", "category": "PCO", "subcat": "OUTBOARD", "liters": 12.0, "unitsPerCase": 12, "price": 1472.04, "initStock": 0, "aliases": ["OUTBOARD 12x1L"]}, {"code": "3435981", "name": "SCOOTER GEAR 80W90 12X 0.12L R", "category": "PCO", "subcat": "SCT GEAR", "liters": 1.44, "unitsPerCase": 12, "price": 422.06, "initStock": 23, "aliases": ["SCOOTER GEAR OIL 12x0.12L"]}, {"code": "3427710", "name": "3M WINDSHIELD COATER 6 X 200 ML", "category": "PCO", "subcat": "3M", "liters": 0, "unitsPerCase": 6, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "3427666", "name": "3M GLOSS ENHANCER 6 X 400 ML", "category": "PCO", "subcat": "3M", "liters": 0, "unitsPerCase": 6, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "278025", "name": "TruePower ATF DEX 3 L1 12x1 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 12, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277860", "name": "TruePower GEO 0W20 SP L4 4x4 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277878", "name": "TruePower GEO 5W30 SP L4 4x4 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277886", "name": "TruePower GEO 10W40 SP L4 4x4 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277827", "name": "TruePower DEO 10W30 CI4 L7 4x7 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277835", "name": "TruePower DEO 15W40 CI4 L7 4x7 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}, {"code": "277576", "name": "TruePower DEO 5W30 CK4 L7 4x7 L", "category": "PCO", "subcat": "SCHF", "liters": 0, "unitsPerCase": 4, "price": 0.0, "initStock": 0, "aliases": []}];
 
   if(!getProds().length){
     // Map seed to app product format (initStock → stored as audit round "ยอดยกมา")

@@ -698,19 +698,30 @@ function computeStock(){
   const moves=getMoves();
   const lastDate=getLastAuditDate();
   const stock={};
+  
   prods.forEach(p=>{
     const la=lastAudit[p.code];
     let base=la?la.counted:0;
     // IN after last audit
     let inAfter=0,outAfter=0;
+    
     moves.forEach(m=>{
-      if(m.code!==p.code)return;
-      if(lastDate&&m.date<lastDate)return; // before last audit → skip
-      if(m.type==='IN')inAfter+=m.qty;
+      // [แก้ไขแล้ว]: บังคับแปลงเป็นข้อความ (String) ทั้งคู่ก่อนจับคู่รหัส
+      if(String(m.code) !== String(p.code)) return; 
+      
+      // [แก้ไขแล้ว]: ตัดเศษเวลาทิ้ง (T17:00:00.000Z) ให้เหลือแค่ YYYY-MM-DD
+      const mDate = String(m.date).split('T')[0];
+      
+      // ถ้ายอดขายเกิดก่อนวันที่นับสต๊อก ให้ข้ามไป (ถ้านับเช้า ขายเย็น วันเดียวกัน จะไม่ถูกข้าม)
+      if(lastDate && mDate < lastDate) return; 
+
+      if(m.type==='IN') inAfter+=m.qty;
       else outAfter+=m.qty;
     });
+    
     stock[p.code]={base,inAfter,outAfter,net:base+inAfter-outAfter,lastAuditDate:la?la.date:null};
   });
+  
   return stock;
 }
 
@@ -1201,7 +1212,8 @@ function renderOverview(){
   // sum IN/OUT after last audit
   let totalIn=0,totalOut=0;
   moves.forEach(m=>{
-    if(lastDate&&m.date<lastDate)return;
+    const mDate = String(m.date).split('T')[0];
+    if(lastDate && mDate < lastDate) return;
     if(m.type==='IN')totalIn+=m.qty;else totalOut+=m.qty;
   });
   document.getElementById('ov-in').textContent=totalIn;
@@ -1256,13 +1268,18 @@ function renderChart(){
   for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().slice(0,10));}
   const dayIn={};const dayOut={};
   dates.forEach(d=>{dayIn[d]=0;dayOut[d]=0;});
+  
   moves.forEach(m=>{
-    if(!dates.includes(m.date))return;
+    // ตัดเศษเวลาทิ้ง เอาแค่ YYYY-MM-DD มาเทียบ
+    const mDate = String(m.date).split('T')[0]; 
+    if(!dates.includes(mDate))return;
+    
     const p=prodMap[m.code];
     if(catFilter!=='all' && (!p || p.category!==catFilter))return;
-    if(m.type==='IN')dayIn[m.date]+=m.qty;
-    else dayOut[m.date]+=m.qty;
+    if(m.type==='IN')dayIn[mDate]+=m.qty;
+    else dayOut[mDate]+=m.qty;
   });
+  
   const maxVal=Math.max(1,...dates.map(d=>Math.max(dayIn[d],dayOut[d])));
   // render as SVG bars
   const W=el.clientWidth||340,H=120;

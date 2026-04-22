@@ -1370,20 +1370,37 @@ function render(){
   if(sub) data=data.filter(d=>d.sub===sub);
   if(tierFilter.size>0) data=data.filter(d=>tierFilter.has(d.tier));
   if(q){
-    const tierMap={'full syn':'FS','fullsyn':'FS','fs':'FS','part syn':'PS','partsyn':'PS','ps':'PS','mineral':'MIN','min':'MIN'};
-    const tierQ=tierMap[q.replace(/\s/g,'').toLowerCase()];
-    data=data.filter(d=>{
-      if(tierQ) return d.tier===tierQ;
-      if(matchVis(q,d.name)) return true;
-      const name=d.name.toLowerCase();
-      const pack=d.pack.toLowerCase();
-      const priceStr=d.unitPrice.toString();
-      const perUnitStr=d.perUnit.toString();
-      const tierLabel=d.tier==='FS'?'full syn':d.tier==='PS'?'part syn':'mineral';
-      return name.includes(q)||d.code.includes(q)||pack.includes(q)||
-             d.sub.toLowerCase().includes(q)||priceStr.includes(q)||
-             perUnitStr.includes(q)||tierLabel.includes(q)||
-             (SUB_LABELS[d.sub]||'').toLowerCase().includes(q);
+    // แยกคำค้นหาด้วยช่องว่าง
+    const tokens = q.split(/\s+/);
+    const tierMap = {'fullsyn':'FS', 'fs':'FS', 'partsyn':'PS', 'ps':'PS', 'mineral':'MIN', 'min':'MIN'};
+    
+    data = data.filter(d => {
+      const name = d.name.toLowerCase();
+      const pack = d.pack.toLowerCase();
+      const code = d.code.toLowerCase();
+      const sub = d.sub.toLowerCase();
+      const subLabel = (SUB_LABELS[d.sub] || '').toLowerCase();
+      const priceStr = d.unitPrice.toString();
+      const perUnitStr = d.perUnit.toString();
+      // ดัก string ของ tier ให้ครอบคลุมการค้นหาทั้งแบบย่อและเต็ม
+      const tierLabel = d.tier === 'FS' ? 'full syn fs' : d.tier === 'PS' ? 'part syn ps' : 'mineral min';
+
+      // เช็คว่า "ทุกคำ (token)" ต้องตรงกับข้อมูลส่วนใดส่วนหนึ่งของสินค้านั้น
+      return tokens.every(token => {
+        // 1. เช็ค Tier ตรงๆ
+        if(tierMap[token] && d.tier === tierMap[token]) return true;
+        // 2. เช็คเบอร์น้ำมัน (ฟังก์ชัน matchVis เดิมรองรับอยู่แล้ว)
+        if(matchVis(token, d.name)) return true;
+        // 3. เช็คว่าเป็นส่วนหนึ่งของชื่อ, รหัส, ขนาด, ราคา หรือไม่
+        return name.includes(token) || 
+               code.includes(token) || 
+               pack.includes(token) || 
+               sub.includes(token) || 
+               subLabel.includes(token) || 
+               priceStr.includes(token) || 
+               perUnitStr.includes(token) || 
+               tierLabel.includes(token);
+      });
     });
   }
   document.getElementById('cnt').textContent=data.length+' รายการ';

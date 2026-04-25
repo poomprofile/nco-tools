@@ -330,7 +330,7 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
 // ═══════════════════════════════════════
 //  CONFIG — แก้สองบรรทัดนี้หลัง deploy
 // ═══════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuI6JvmMyOnICV68KGGF0OKOBzNb3fyYoC-_1wMyA6SDQzCmGDk0Rd439m83kXRaZK/exec'; // วาง URL ใหม่ที่นี่
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuzDKlT1n1fWtJIeX4U9yJK6-8blivFmnH5NQsMHaBgvXTthrKV3vjG9-izqXmOThD/exec'; // วาง URL ใหม่ที่นี่
 const MY_EMAIL   = 'fernery11@gmail.com';
 
 // ═══════════════════════════════════════
@@ -364,6 +364,7 @@ async function apiPost(action, data){
 
 async function apiGet(params){
   try{
+    params.email = MY_EMAIL; // <-- เพิ่มบรรทัดนี้เพื่อให้ประตูหลังบ้านยอมเปิดรับ
     const res = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params));
     const json = await res.json();
     return json;

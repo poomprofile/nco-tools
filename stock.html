@@ -330,7 +330,7 @@ window.tailwind={};tailwind.config={darkMode:'class',theme:{extend:{
 // ═══════════════════════════════════════
 //  CONFIG — แก้สองบรรทัดนี้หลัง deploy
 // ═══════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7jG4E9y24DI24sc_ubPieT-b3Lqn1yTyzS7zl1FB734E56Zmcz8mVB61UN_M3j52u/exec'; // วาง URL ใหม่ที่นี่
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwy-57pehcORi3q8TfHTEOERbXJsHireusQ3L6qksIrIlDLMKNCiR08EEqtUAQf9Vk/exec'; // วาง URL ใหม่ที่นี่
 const MY_EMAIL   = 'fernery11@gmail.com';
 
 // ═══════════════════════════════════════
@@ -727,21 +727,42 @@ function renderMvLog(){
   `;}).join('');
 }
 
+let isPolling = false; // ตัวแปรควบคุมการถามสถานะ
+
 async function handleBCSync(){
   if(!isConfigured()) return;
   const btn = document.getElementById('btnBCSync');
   const status = document.getElementById('syncStatus');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> กำลัง Sync...';
-  status.textContent = 'กำลังดึงข้อมูลจาก Google Sheets...';
+  btn.disabled = true; 
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> กำลัง Sync...';
+  
+  // 1. สร้างตัว Polling ยิงไปถามหลังบ้านทุกๆ 1.5 วินาที
+  isPolling = true;
+  const poll = async () => {
+    while(isPolling){
+      try {
+        const p = await apiGet({action: 'getSyncProgress'});
+        if(p && p.msg) status.textContent = p.msg; // อัปเดตข้อความบนหน้าจอ
+      } catch(e){}
+      await new Promise(r => setTimeout(r, 1500)); // พัก 1.5 วิแล้วถามใหม่
+    }
+  };
+  poll(); // สั่งให้ตัวถามเริ่มทำงานคู่ขนานไปกับงานหลัก
 
+  // 2. สั่งรันการ Sync หลัก
   const res = await apiGet({action:'syncBCSales'});
+  
+  // 3. เมื่อ Sync จบ ให้สั่งหยุดตัว Polling
+  isPolling = false; 
+
   if(res && res.ok){
-    status.textContent = `เพิ่มใหม่: ${res.added} | ข้าม: ${res.skipped}`;
+    status.textContent = `ประมวลผลเสร็จสิ้น! บันทึกยอดใหม่: ${res.added} รายการ`;
     await syncFromSheets();
   } else {
     status.textContent = 'Sync ไม่สำเร็จ: ' + (res?.error||'Network Error');
   }
-  btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Sync ยอดขายล่าสุด';
+  btn.disabled = false; 
+  btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Sync ยอดขายล่าสุด';
 }
 
 // ═══════════════════════════════════════

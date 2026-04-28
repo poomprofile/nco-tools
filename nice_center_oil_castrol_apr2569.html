@@ -601,8 +601,10 @@ const PRODUCTS=[
   {code:'3810063',name:'HYSPIN AWS 68 18L',pack:'1×18L',packNum:1,size:18,unitPrice:2408,supPrice:2115,perUnit:2408,cat:'OTHER',sub:'HYDRAULIC',tier:'MIN'},
 ];
 
-// Fallback: หากตัวไหนดึงไม่เจอใน CSV ให้ใช้ราคาขาย * 0.85 เป็นต้นทุนจำลอง
-PRODUCTS.forEach(p => { if(!p.supPrice) p.supPrice = Math.round(p.unitPrice * 0.85); });
+// บวก VAT 7% ให้ราคาทุน (SUP) ทุกรายการอัตโนมัติ
+PRODUCTS.forEach(p => {
+  if (p.supPrice) p.supPrice = p.supPrice * 1.07;
+});
 
 const SUB_MAP={ PCO:['EDGE','MAGNATEC','GTX','VISCO'], MCO:['POWER1','ACTIV','GO2T','GEAR'], OTHER:['ATF','MTF','BRAKE','COOLANT','GREASE','HYDRAULIC','OTHERS'] };
 const SUB_LABELS={ POWER1:'Power1',ACTIV:'Activ',GO2T:'Go! 2T',GEAR:'Scooter Gear', EDGE:'Edge',MAGNATEC:'Magnatec',GTX:'GTX',VISCO:'Visco 3000', ATF:'ATF / CVT',MTF:'เกียร์ / เฟืองท้าย',BRAKE:'น้ำมันเบรค', COOLANT:'น้ำยาหล่อเย็น',GREASE:'จารบี',HYDRAULIC:'ไฮดรอลิค',OTHERS:'อื่นๆ' };
@@ -615,12 +617,16 @@ const SUP_EMAILS = ['poomprofile@gmail.com', 'fernery11@gmail.com'];
 // ─── AUTH & MODE ACCESS ───
 function initModeAccess() {
   try {
-    const user = typeof ncoGetUser === 'function' ? ncoGetUser() : null;
-    // อนุญาตให้เห็นโหมด SUP เมื่อล็อกอินด้วยอีเมลที่กำหนด
-    if (user && SUP_EMAILS.includes(user.email)) {
+    // เรียกใช้ ncoGetSession() จากไฟล์ auth.js
+    const session = typeof ncoGetSession === 'function' ? ncoGetSession() : null;
+    
+    // อนุญาตให้เห็นโหมด SUP เมื่อล็อกอินด้วยอีเมลที่กำหนดไว้ใน SUP_EMAILS
+    if (session && session.email && SUP_EMAILS.includes(session.email.toLowerCase())) {
       document.getElementById('sup-toggle').style.display = 'flex';
     }
-  } catch(e) { console.log('Auth check skipped or failed', e); }
+  } catch(e) { 
+    console.log('Auth check skipped or failed', e); 
+  }
 }
 
 function switchMode(mode) {

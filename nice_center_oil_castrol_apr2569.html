@@ -811,6 +811,39 @@ function render() {
   document.getElementById('tbody').innerHTML = html || `<tr><td colspan="7" class="no-data">ไม่พบสินค้า</td></tr>`;
 }
 
+// ฟอร์แมตทศนิยม 2 ตำแหน่งให้ดูง่ายขึ้นเวลาคำนวณต้นทุน
+function fmt2(n){ return (+n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+// ฟังก์ชันคำนวณกลับจากราคาเป้าหมาย/กป. ให้เป็น % ส่วนลด (Override)
+function calcTarget(code, targetRaw, basePrice, packNum) {
+  if (!cart[code]) return;
+  const targetUnit = parseFloat(targetRaw);
+  
+  // ถ้าลบช่องเป้าหมายทิ้ง ให้เคลียร์ค่า Override กลับเป็นค่าว่าง
+  if (isNaN(targetUnit) || targetUnit <= 0) {
+    cart[code].override = '';
+    renderCart();
+    return;
+  }
+
+  const qty = cart[code].qty;
+  const free = cart[code].freeQty || 0;
+
+  // สมการ: ยอดรวมที่ต้องได้ = ราคาเป้าหมาย * จำนวนกระป๋องทั้งหมด (ซื้อ + แถม)
+  const requiredTotalAfter = targetUnit * (qty + free) * packNum;
+  const beforePrice = qty * basePrice;
+
+  // หา % ส่วนลดที่ต้องใช้
+  let requiredDiscPct = (1 - (requiredTotalAfter / beforePrice)) * 100;
+  
+  // ป้องกันเคสตั้งราคาเป้าหมายสูงกว่าราคาตั้ง (ลบติดลบ)
+  if (requiredDiscPct < 0) requiredDiscPct = 0; 
+  if (requiredDiscPct > 100) requiredDiscPct = 100;
+
+  cart[code].override = requiredDiscPct.toFixed(2);
+  renderCart();
+}
+
 function renderCart() {
   const items = Object.values(cart);
   document.getElementById('cart-count').textContent = items.reduce((a, c) => a + c.qty, 0);
@@ -836,44 +869,66 @@ function renderCart() {
 
     totalBefore += before; totalAfter += after; totalUnits += totalBoxes; totalLiters += litersTotal;
     
+    // ── ส่วนที่ 1: ใส่ (%) ในสรุปส่วนลด ──
     let discBreakdown = '';
-    const hasOverride = item.override !== '' && !isNaN(parseFloat(item.override));
-    if (hasOverride) discBreakdown = `<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">Override ${fmtD(parseFloat(item.override))}%</span><span class="ci-price-val save">−${fmt(before*(parseFloat(item.override)/100))} บ.</span></div>`;
-    else {
+    const hasOverride = item.override !== '' && item.override !== null && !isNaN(parseFloat(item.override));
+    
+    if (hasOverride) {
+      discBreakdown = `<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">Override ล็อกราคา (-${parseFloat(item.override)}%)</span><span class="ci-price-val save">−${fmt(before*(parseFloat(item.override)/100))} บ.</span></div>`;
+    } else {
       discRules.forEach(r => {
         const rpct = parseFloat(r.pct) || 0;
-        if (rpct > 0 && ruleMatches(r, p)) discBreakdown += `<div class="ci-price-row"><span class="ci-price-label">📌 ${r.name}</span><span class="ci-price-val save">−${fmt(before*(rpct/100))} บ.</span></div>`;
+        if (rpct > 0 && ruleMatches(r, p)) {
+          // เพิ่ม (-${rpct}%) ต่อท้ายชื่อโปรโมชั่น
+          discBreakdown += `<div class="ci-price-row"><span class="ci-price-label">📌 ${r.name} (-${rpct}%)</span><span class="ci-price-val save">−${fmt(before*(rpct/100))} บ.</span></div>`;
+        }
       });
     }
 
+    // ── ส่วนที่ 2: อัปเดตหน้าตาตะกร้า ใส่ช่องเป้าหมาย และแสดงต้นทุนถัวเฉลี่ย ──
     html += `<div class="ci">
       <div class="ci-top">
         <div><div class="ci-name">${p.name}</div><div class="ci-pack">${p.pack} · ${fmt(basePrice)} บ./ลัง</div></div>
         <button class="ci-remove" onclick="removeFromCart('${p.code}')">×</button>
       </div>
+      
       <div class="ci-controls">
-        <span class="ci-ctrl-label">ลัง</span>
+        <span class="ci-ctrl-label">ซื้อ(ลัง)</span>
         <div class="qty-ctrl">
           <button class="qty-btn" onclick="changeQty('${p.code}',-1)">−</button>
           <input class="qty-input" id="qi_${p.code}" type="number" min="1" value="${qty}" oninput="setQtyInput('${p.code}',this.value)" onblur="if(!this.value||this.value<1){this.value=1;setQtyInput('${p.code}',1)}">
           <button class="qty-btn" onclick="changeQty('${p.code}',+1)">+</button>
         </div>
-        <div class="override-wrap">
-          <div class="override-col">
-            <span class="ci-ctrl-label" style="color:var(--theme)">แถม (ลัง)</span>
-            <input class="override-input" type="number" min="0" value="${free}" oninput="setFreeQty('${p.code}', this.value)" style="border-color:var(--theme); color:var(--theme)">
-          </div>
-          <div class="override-col">
-            <span class="ci-ctrl-label">ลดพิเศษ %</span>
-            <input class="override-input" type="text" inputmode="decimal" placeholder="—" value="${item.override}" onblur="var v=this.value.replace(/[^0-9.]/g,'');if(parseFloat(v)>100)v='100';this.value=v;setOverride('${p.code}',v)">
-          </div>
+      </div>
+
+      <div class="override-wrap" style="flex-wrap: wrap; justify-content: flex-end; margin-bottom: 8px;">
+        <div class="override-col">
+          <span class="ci-ctrl-label" style="color:var(--theme)">แถม(ลัง)</span>
+          <input class="override-input" type="number" min="0" value="${free}" oninput="setFreeQty('${p.code}', this.value)" style="border-color:var(--theme); color:var(--theme); width:46px;">
+        </div>
+        <div class="override-col">
+          <span class="ci-ctrl-label" style="color:#D4720A">เป้า/กป.</span>
+          <input class="override-input" type="number" min="0" placeholder="ยิงราคา" onchange="calcTarget('${p.code}', this.value, ${basePrice}, ${p.packNum})" style="border-color:#D4720A; color:#D4720A; width:60px;" title="ใส่ราคาเป้าหมายต่อกระป๋อง ระบบจะคำนวณ % ลดให้อัตโนมัติ">
+        </div>
+        <div class="override-col">
+          <span class="ci-ctrl-label">ลดพิเศษ%</span>
+          <input class="override-input" type="text" inputmode="decimal" placeholder="—" value="${item.override}" onblur="var v=this.value.replace(/[^0-9.]/g,'');if(parseFloat(v)>100)v='100';this.value=v;setOverride('${p.code}',v)" style="width:54px;">
         </div>
       </div>
+
       <div class="ci-price-block">
         <div class="ci-price-row"><span class="ci-price-label">ก่อนลด (${qty} ลัง)</span><span class="ci-price-val${disc>0?' strike':''}">${fmt(before)} บ.</span></div>
         ${discBreakdown}
         <div class="ci-price-row"><span class="ci-price-label" style="font-weight:600">ราคาสุทธิ</span><span class="ci-price-val final">${fmt(after)} บ.</span></div>
-        <div class="ci-price-row"><span class="ci-price-label" style="color:var(--theme-dark)">เฉลี่ยต้นทุน/กระป๋อง (รวมของแถม)</span><span class="ci-price-val" style="color:var(--theme-dark);font-weight:600">${fmtD(effectivePerUnit)} บ.</span></div>
+        
+        <div class="ci-price-row" style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--line-soft);">
+          <span class="ci-price-label" style="color:var(--theme-dark)">เฉลี่ยต้นทุน/ลัง (รวมแถม)</span>
+          <span class="ci-price-val" style="color:var(--theme-dark);">${fmt2(effectivePerBox)} บ.</span>
+        </div>
+        <div class="ci-price-row">
+          <span class="ci-price-label" style="color:var(--theme-dark);font-weight:600">เฉลี่ยต้นทุน/กป. (รวมแถม)</span>
+          <span class="ci-price-val" style="color:var(--theme-dark);font-weight:700;font-size:13px">${fmt2(effectivePerUnit)} บ.</span>
+        </div>
       </div>
     </div>`;
   });

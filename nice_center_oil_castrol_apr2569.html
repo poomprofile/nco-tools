@@ -36,8 +36,25 @@
   --shadow-lg: 0 8px 32px rgba(var(--theme-rgb),.13);
 }
 
+/* ── SUP MODE THEME ── */
+body.mode-sup {
+  --theme:        #A32020;
+  --theme-dark:   #7A1818;
+  --theme-mid:    #8B0000;
+  --theme-light:  #f8eaea;
+  --theme-pale:   #fdf5f5;
+  --theme-rgb:    163,32,32;
+}
+body.mode-sup .header {
+  background: var(--theme-dark);
+}
+body.mode-sup .castrol-badge {
+  background: var(--gold);
+  color: var(--theme-dark);
+}
+
 /* ── MCO theme: warm amber-orange ── */
-body.theme-MCO {
+body.theme-MCO:not(.mode-sup) {
   --theme:        #D4720A;
   --theme-dark:   #8f4a00;
   --theme-mid:    #b55e00;
@@ -48,7 +65,7 @@ body.theme-MCO {
 }
 
 /* ── PCO theme: navy-teal ── */
-body.theme-PCO {
+body.theme-PCO:not(.mode-sup) {
   --theme:        #1E4D8C;
   --theme-dark:   #122d54;
   --theme-mid:    #183d73;
@@ -59,7 +76,7 @@ body.theme-PCO {
 }
 
 /* ── OTHER theme: slate-purple ── */
-body.theme-OTHER {
+body.theme-OTHER:not(.mode-sup) {
   --theme:        #5B4A8A;
   --theme-dark:   #372c57;
   --theme-mid:    #4a3b73;
@@ -127,7 +144,6 @@ body {
   background: rgba(255,255,255,0.15);
 }
 .header-title {
-  flex: 1;
   font-size: 13px;
   color: rgba(255,255,255,0.7);
   font-weight: 300;
@@ -145,32 +161,28 @@ body {
   border-radius: 4px;
   letter-spacing: 1px;
   text-transform: uppercase;
+  transition: background 0.3s, color 0.3s;
 }
-.cart-trigger {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: white;
-  border-radius: var(--radius-sm);
-  padding: 8px 16px;
-  font-size: 13px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer;
-  display: flex;
+.mode-toggle {
+  display: none; /* เปิดเมื่อ Auth ผ่าน */
   align-items: center;
   gap: 8px;
-  transition: background 0.15s;
+  margin-left: auto;
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
 }
-.cart-trigger:hover { background: rgba(255,255,255,0.18); }
-.cart-trigger-count {
-  background: var(--gold);
-  color: var(--theme-dark);
-  border-radius: 20px;
-  padding: 1px 7px;
-  font-size: 11px;
+.mode-toggle select {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
   font-weight: 600;
-  min-width: 20px;
-  text-align: center;
+  outline: none;
+  cursor: pointer;
 }
+.mode-toggle select option { color: var(--ink); font-weight: normal; }
 
 /* ─── LAYOUT ─── */
 .page {
@@ -195,120 +207,27 @@ body {
   flex-direction: column;
   gap: 10px;
 }
-.search-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--ink-faint);
-  font-size: 16px;
-  pointer-events: none;
-}
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-size: 16px; pointer-events: none; }
 .search-box {
-  width: 100%;
-  padding: 12px 40px 12px 40px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%; padding: 12px 40px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  font-size: 16px; font-family: 'Barlow', 'Noto Sans Thai', sans-serif; background: var(--bg); color: var(--ink); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
 }
-.search-box:focus {
-  border-color: var(--theme);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(var(--theme-rgb),0.12);
-}
+.search-box:focus { border-color: var(--theme); background: white; box-shadow: 0 0 0 3px rgba(var(--theme-rgb),0.12); }
 .search-clear {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--ink-faint);
-  font-size: 16px;
-  line-height: 1;
-  padding: 4px;
-  border-radius: 50%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.1s, background 0.1s;
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--ink-faint); font-size: 16px; line-height: 1; padding: 4px; border-radius: 50%; display: none; align-items: center; justify-content: center; transition: color 0.1s, background 0.1s;
 }
 .search-clear:hover { color: var(--ink); background: var(--line-soft); }
 .search-clear.visible { display: flex; }
-.filter-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 11px; color: var(--ink-faint); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+.tab-btn, .sub-btn, .tier-btn {
+  padding: 7px 18px; border: 1px solid var(--line); border-radius: 20px; font-size: 13px; font-family: 'Barlow', 'Noto Sans Thai', sans-serif; cursor: pointer; background: transparent; color: var(--ink-soft); transition: all 0.15s; white-space: nowrap;
 }
-.filter-label {
-  font-size: 11px;
-  color: var(--ink-faint);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.tab-btn {
-  padding: 7px 18px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  font-size: 13px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer;
-  background: transparent;
-  color: var(--ink-soft);
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.tab-btn:hover { border-color: var(--theme); color: var(--theme); }
-.tab-btn.active {
-  background: var(--theme);
-  border-color: var(--theme);
-  color: white;
-  font-weight: 500;
-}
-.sub-btn {
-  padding: 5px 13px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  font-size: 12px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer;
-  background: transparent;
-  color: var(--ink-soft);
-  transition: all 0.15s;
-}
-.sub-btn:hover { border-color: var(--theme); color: var(--theme); }
-.sub-btn.active {
-  background: var(--theme-light);
-  border-color: var(--theme);
-  color: var(--theme-dark);
-  font-weight: 500;
-}
-/* tier filter pills */
-.tier-btn {
-  padding: 5px 13px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  font-size: 12px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer;
-  background: transparent;
-  color: var(--ink-soft);
-  transition: all 0.15s;
-}
+.sub-btn, .tier-btn { padding: 5px 13px; font-size: 12px; }
+.tab-btn:hover, .sub-btn:hover { border-color: var(--theme); color: var(--theme); }
+.tab-btn.active { background: var(--theme); border-color: var(--theme); color: white; font-weight: 500; }
+.sub-btn.active { background: var(--theme-light); border-color: var(--theme); color: var(--theme-dark); font-weight: 500; }
 .tier-btn:hover { opacity: 0.85; }
 .tier-btn.t-fs { border-color: #c8a030; color: #7a5800; }
 .tier-btn.t-fs.active { background: #fdf0c0; border-color: #c8a030; color: #6b4c00; font-weight:600; }
@@ -316,94 +235,27 @@ body {
 .tier-btn.t-ps.active { background: #e0eef8; border-color: #5080a8; color: #1a3a58; font-weight:600; }
 .tier-btn.t-min { border-color: #9ab0a8; color: #3a5048; }
 .tier-btn.t-min.active { background: #e8f0ec; border-color: #6a9080; color: #2a4038; font-weight:600; }
-.result-count {
-  font-size: 12px;
-  color: var(--ink-faint);
-  margin-left: auto;
-  white-space: nowrap;
-}
+.result-count { font-size: 12px; color: var(--ink-faint); margin-left: auto; white-space: nowrap; }
 
 /* ─── TABLE ─── */
-.table-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.table-wrap {
-  overflow-x: auto;
-  max-height: calc(100vh - 220px);
-  overflow-y: auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  table-layout: fixed;
-}
-thead th {
-  background: var(--theme-dark);
-  color: rgba(255,255,255,0.85);
-  padding: 12px 14px;
-  text-align: left;
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.3px;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  white-space: nowrap;
-  border-right: 1px solid rgba(255,255,255,0.07);
-  transition: background 0.3s;
-}
+.table-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.table-wrap { overflow-x: auto; max-height: calc(100vh - 220px); overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+thead th { background: var(--theme-dark); color: rgba(255,255,255,0.85); padding: 12px 14px; text-align: left; font-weight: 500; font-size: 12px; position: sticky; top: 0; z-index: 5; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.07); transition: background 0.3s; }
 thead th:last-child { border-right: none; }
 thead th.num { text-align: right; }
 tbody tr { border-bottom: 1px solid var(--line-soft); transition: background 0.1s; }
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: var(--theme-pale); }
-td {
-  padding: 11px 14px;
-  vertical-align: middle;
-  color: var(--ink);
-}
-td.num {
-  text-align: right;
-  font-family: 'Barlow', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 0, "tnum" 1;
-  color: var(--ink-mid);
-}
-td.code {
-  font-family: 'Barlow', sans-serif;
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-faint);
-}
-.section-row td {
-  background: var(--theme-light);
-  color: var(--theme-dark);
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 6px 14px;
-  letter-spacing: 0.3px;
-  border-bottom: 1px solid rgba(var(--theme-rgb),0.12);
-}
-.prod-name { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+td { padding: 11px 14px; vertical-align: middle; color: var(--ink); }
+td.num { text-align: right; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink-mid); font-variant-numeric: tabular-nums; }
+td.code { font-family: 'Barlow', sans-serif; font-size: 11.5px; color: var(--ink-faint); }
+.section-row td { background: var(--theme-light); color: var(--theme-dark); font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-bottom: 1px solid rgba(var(--theme-rgb),0.12); }
+.prod-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
 .prod-pack { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
 
 /* badges */
-.badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
+.badge { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; white-space: nowrap; }
 .b-mco { background: #e8f5ee; color: #005c31; border: 1px solid #b5dcc5; }
 .b-pco { background: #e8f0fb; color: #1a4fa0; border: 1px solid #b3c9f0; }
 .b-oth { background: #fff3e0; color: #8a5a00; border: 1px solid #f0d080; }
@@ -411,28 +263,11 @@ td.code {
 .b-ps  { background: #eef4fb; color: #2c5f80; border: 1px solid #b0ccdf; }
 .b-min { background: #f2f4f3; color: #4a5550; border: 1px solid #d0d8d4; }
 
-.add-btn {
-  padding: 5px 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer;
-  background: white;
-  color: var(--ink-soft);
-  transition: all 0.15s;
-  white-space: nowrap;
-  font-weight: 500;
-  width: 100%;
-  display: block;
-  text-align: center;
-  box-sizing: border-box;
-}
+.add-btn { padding: 5px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 11px; font-family: 'Barlow', 'Noto Sans Thai', sans-serif; cursor: pointer; background: white; color: var(--ink-soft); font-weight: 500; width: 100%; transition: all 0.15s; }
 .add-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
 .add-btn.in-cart { background: var(--theme-light); border-color: var(--theme); color: var(--theme-dark); }
 .no-data { text-align: center; padding: 3rem; color: var(--ink-faint); font-size: 13px; }
 
-/* col widths */
 th:nth-child(1) { width: 10%; }
 th:nth-child(2) { width: 33%; }
 th:nth-child(3) { width: 8%; }
@@ -440,434 +275,95 @@ th:nth-child(4) { width: 14%; }
 th:nth-child(5) { width: 13%; }
 th:nth-child(6) { width: 10%; }
 th:nth-child(7) { width: 12%; }
-/* allow header to wrap instead of overflow */
-thead th { white-space: normal !important; line-height: 1.35; vertical-align: bottom; }
 
 /* ─── CART PANEL ─── */
-.cart-panel {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  position: sticky;
-  top: 76px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-.cart-header {
-  background: var(--theme-dark);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: background 0.3s;
-}
-.cart-header-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.2px;
-}
-.cart-count-badge {
-  background: var(--gold);
-  color: var(--theme-dark);
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 20px;
-  padding: 2px 9px;
-  min-width: 24px;
-  text-align: center;
-}
+.cart-panel { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); position: sticky; top: 76px; display: flex; flex-direction: column; overflow: hidden; }
+.cart-header { background: var(--theme-dark); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; transition: background 0.3s; }
+.cart-header-title { font-size: 13px; font-weight: 600; color: white; }
+.cart-count-badge { background: var(--gold); color: var(--theme-dark); font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 9px; min-width: 24px; text-align: center; }
 .cart-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-
-.global-disc-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--theme-pale);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  transition: background 0.3s;
-}
-.global-disc-icon { font-size: 15px; }
-.global-disc-label { font-size: 11px; color: var(--ink-soft); flex: 1; }
-.disc-input {
-  width: 62px;
-  padding: 5px 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: 'Barlow', sans-serif;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 0;
-  text-align: right;
-  background: white;
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.disc-input:focus { border-color: var(--theme); box-shadow: 0 0 0 2px rgba(var(--theme-rgb),0.1); }
-.disc-pct { font-size: 12px; color: var(--ink-soft); }
 
 .cart-items { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; }
 .cart-empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink-faint); font-size: 12px; line-height: 1.8; }
 .cart-empty-icon { font-size: 28px; margin-bottom: 8px; display: block; opacity: 0.4; }
 
-.ci {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 10px 11px;
-  background: white;
-  transition: box-shadow 0.15s;
-}
+.ci { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 11px; background: white; transition: box-shadow 0.15s; }
 .ci:hover { box-shadow: var(--shadow); }
 .ci-top { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 8px; }
-.ci-name { font-size: 11.5px; font-weight: 600; color: var(--ink); flex: 1; line-height: 1.35; }
-.ci-pack { font-size: 10px; color: var(--ink-soft); font-weight: 400; }
-.ci-remove {
-  background: none; border: none; cursor: pointer;
-  color: var(--ink-faint); font-size: 16px; line-height: 1;
-  padding: 0 2px; flex-shrink: 0; transition: color 0.1s;
-}
+.ci-name { font-size: 11.5px; font-weight: 600; flex: 1; line-height: 1.35; }
+.ci-pack { font-size: 10px; color: var(--ink-soft); }
+.ci-remove { background: none; border: none; cursor: pointer; color: var(--ink-faint); font-size: 16px; padding: 0 2px; transition: color 0.1s; }
 .ci-remove:hover { color: var(--red); }
 .ci-controls { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .ci-ctrl-label { font-size: 10px; color: var(--ink-soft); white-space: nowrap; }
-.qty-ctrl { display: flex; align-items: center; gap: 3px; }
-.qty-btn {
-  width: 22px; height: 22px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  cursor: pointer;
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 600; transition: all 0.1s;
-}
-.qty-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
-.qty-val { font-size: 13px; font-weight: 600; min-width: 22px; text-align: center; font-family: 'Barlow', sans-serif; font-variant-numeric: tabular-nums; font-feature-settings: "zero" 0; }
-.override-wrap { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-.override-input {
-  width: 48px; padding: 3px 6px;
-  border: 1px solid var(--line);
-  border-radius: 5px; font-size: 16px;
-  font-family: 'Barlow', sans-serif;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 0;
-  text-align: right; background: white;
-  color: var(--ink); outline: none;
-}
-.override-input:focus { border-color: var(--theme); }
-.override-input::placeholder { color: var(--ink-faint); }
 
-.ci-price-block {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 7px;
-  display: flex; flex-direction: column; gap: 3px;
-}
+.qty-ctrl { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.qty-btn { width: 26px; height: 26px; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; background: var(--bg); color: var(--ink); font-size: 15px; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.1s; }
+.qty-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
+.qty-input { width: 44px; height: 26px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Barlow', sans-serif; font-weight: 600; text-align: center; background: white; color: var(--ink); outline: none; }
+.qty-input:focus { border-color: var(--theme); }
+.override-wrap { display: flex; gap: 8px; margin-left: auto; align-items: flex-end; }
+.override-col { display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+.override-input { width: 46px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 5px; font-size: 14px; font-family: 'Barlow', sans-serif; font-weight: 500; text-align: right; background: white; color: var(--ink); outline: none; }
+.override-input:focus { border-color: var(--theme); }
+
+.ci-price-block { border-top: 1px solid var(--line-soft); padding-top: 7px; display: flex; flex-direction: column; gap: 3px; }
 .ci-price-row { display: flex; justify-content: space-between; align-items: center; }
 .ci-price-label { font-size: 10px; color: var(--ink-soft); }
-.ci-price-val { font-size: 11px; font-family: 'Barlow', sans-serif; font-weight: 500; font-variant-numeric: tabular-nums; font-feature-settings: "zero" 0, "tnum" 1; color: var(--ink-mid); }
+.ci-price-val { font-size: 11px; font-family: 'Barlow', sans-serif; font-weight: 500; color: var(--ink-mid); }
 .ci-price-val.strike { text-decoration: line-through; color: var(--ink-faint); font-size: 10px; }
 .ci-price-val.save { color: var(--red); font-size: 10px; }
 .ci-price-val.final { color: var(--theme-dark); font-weight: 600; font-size: 12px; }
 
-.summary-box {
-  background: var(--theme-dark);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  display: flex; flex-direction: column; gap: 5px;
-  transition: background 0.3s;
-}
+.summary-box { background: var(--theme-dark); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: background 0.3s; }
 .sum-row { display: flex; justify-content: space-between; align-items: center; }
 .sum-label { font-size: 11px; color: rgba(255,255,255,0.6); }
-.sum-val { font-size: 12px; font-family: 'Barlow', sans-serif; font-weight: 500; font-variant-numeric: tabular-nums; font-feature-settings: "zero" 0; color: rgba(255,255,255,0.85); }
+.sum-val { font-size: 12px; font-family: 'Barlow', sans-serif; font-weight: 500; color: rgba(255,255,255,0.85); }
 .sum-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 3px 0; }
 .sum-total-label { font-size: 12px; color: white; font-weight: 600; }
-.sum-total-val { font-size: 18px; font-family: 'Barlow Condensed', 'Barlow', sans-serif; font-feature-settings: "zero" 0; color: var(--gold); font-weight: 700; letter-spacing: 0.5px; }
-.sum-save-val { font-size: 11px; color: #7edc9a; font-family: 'Barlow', sans-serif; font-variant-numeric: tabular-nums; }
+.sum-total-val { font-size: 18px; font-family: 'Barlow Condensed', 'Barlow', sans-serif; color: var(--gold); font-weight: 700; }
+.sum-save-val { font-size: 11px; color: #7edc9a; font-family: 'Barlow', sans-serif; }
 
-.clear-btn {
-  width: 100%; padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 12px; font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  cursor: pointer; background: white;
-  color: var(--ink-soft); transition: all 0.15s;
-}
+.disc-rules-panel { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.disc-rules-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.disc-rules-title { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; }
+.disc-add-btn { padding: 4px 10px; border: 1px solid var(--theme); border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; color: var(--theme); background: transparent; cursor: pointer; transition: all 0.15s; }
+.disc-add-btn:hover { background: var(--theme); color: white; }
+.disc-rule { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--line-soft); background: white; flex-wrap: wrap; }
+.disc-rule-name { font-size: 14px; font-weight: 500; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 7px; background: var(--bg); outline: none; width: 90px; }
+.disc-rule-pct { width: 56px; height: 30px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Barlow', sans-serif; text-align: right; outline: none; padding: 4px 22px 4px 6px; }
+.disc-rule-pct-wrap { position: relative; flex-shrink: 0; }
+.disc-rule-pct-sfx { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--ink-faint); }
+.disc-scope-select { flex: 1; min-width: 80px; height: 30px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Barlow', 'Noto Sans Thai', sans-serif; outline: none; }
+.disc-del-btn { width: 24px; height: 24px; border: none; background: transparent; color: var(--ink-faint); font-size: 15px; cursor: pointer; }
+.disc-del-btn:hover { background: var(--red-light); color: var(--red); }
+
+.ctype-row { display: flex; gap: 6px; align-items: center; }
+.ctype-label { font-size: 11px; color: var(--ink-soft); font-weight: 500; }
+.ctype-btn { flex: 1; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; background: white; color: var(--ink-soft); text-align: center; }
+.ctype-btn.active-credit { background: var(--theme-light); border-color: var(--theme); color: var(--theme-dark); font-weight: 600; }
+.ctype-btn.active-cash { background: var(--gold-light); border-color: var(--gold); color: #7a5800; font-weight: 600; }
+
+.clear-btn { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; background: white; color: var(--ink-soft); }
 .clear-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
 
-/* ─── QTY INPUT CONTROL ─── */
-.qty-ctrl {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  flex-shrink: 0;
-}
-.qty-btn {
-  width: 26px; height: 26px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 15px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 600;
-  transition: all 0.1s;
-  flex-shrink: 0;
-}
-.qty-btn:hover { background: var(--theme); border-color: var(--theme); color: white; }
-.qty-input {
-  width: 52px; height: 32px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  font-family: 'Barlow', sans-serif;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 0;
-  text-align: center;
-  background: white;
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.15s;
-  -moz-appearance: textfield;
-}
-.qty-input::-webkit-inner-spin-button,
-.qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-.qty-input:focus { border-color: var(--theme); }
-
-/* ─── DISCOUNT RULES PANEL ─── */
-.disc-rules-panel {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-.disc-rules-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 12px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-}
-.disc-rules-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.disc-add-btn {
-  padding: 4px 10px;
-  border: 1px solid var(--theme);
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  font-weight: 600;
-  color: var(--theme);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.disc-add-btn:hover { background: var(--theme); color: white; }
-.disc-rule {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--line-soft);
-  background: white;
-  flex-wrap: wrap;
-}
-.disc-rule:last-child { border-bottom: none; }
-.disc-rule-name {
-  font-size: 16px;
-  font-weight: 500;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 4px 7px;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  outline: none;
-  width: 90px;
-  transition: border-color 0.15s;
-  flex-shrink: 0;
-}
-.disc-rule-name:focus { border-color: var(--theme); }
-.disc-rule-pct {
-  width: 56px; height: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  font-family: 'Barlow', sans-serif;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 0;
-  text-align: right;
-  background: white;
-  color: var(--ink);
-  outline: none;
-  padding: 4px 22px 4px 6px;
-  transition: border-color 0.15s;
-  -moz-appearance: textfield;
-  flex-shrink: 0;
-}
-.disc-rule-pct::-webkit-inner-spin-button,
-.disc-rule-pct::-webkit-outer-spin-button { -webkit-appearance: none; }
-.disc-rule-pct:focus { border-color: var(--theme); }
-.disc-rule-pct-wrap { position: relative; flex-shrink: 0; }
-.disc-rule-pct-sfx {
-  position: absolute; right: 6px; top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px; color: var(--ink-faint);
-  pointer-events: none;
-}
-.disc-scope-select {
-  flex: 1;
-  min-width: 80px;
-  height: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  padding: 0 6px;
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.disc-scope-select:focus { border-color: var(--theme); }
-.disc-del-btn {
-  width: 24px; height: 24px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--ink-faint);
-  font-size: 15px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.1s;
-  flex-shrink: 0;
-}
-.disc-del-btn:hover { background: var(--red-light); color: var(--red); }
-.disc-rule-tag {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.disc-rule-tag-all { background: var(--theme-light); color: var(--theme-dark); }
-.disc-rule-tag-scope { background: var(--gold-light); color: #7a5800; }
-.ctype-row {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.ctype-label {
-  font-size: 11px;
-  color: var(--ink-soft);
-  font-weight: 500;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.ctype-btn {
-  flex: 1;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-family: 'Barlow', 'Noto Sans Thai', sans-serif;
-  font-weight: 500;
-  cursor: pointer;
-  background: white;
-  color: var(--ink-soft);
-  transition: all 0.15s;
-  text-align: center;
-}
-.ctype-btn:hover { border-color: var(--theme); color: var(--theme); }
-.ctype-btn.active-credit {
-  background: var(--theme-light);
-  border-color: var(--theme);
-  color: var(--theme-dark);
-  font-weight: 600;
-}
-.ctype-btn.active-cash {
-  background: var(--gold-light);
-  border-color: var(--gold);
-  color: #7a5800;
-  font-weight: 600;
-}
-
-/* ─── MOBILE RESPONSIVE ─── */
+/* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
-  .page {
-    grid-template-columns: 1fr;
-    padding: 12px 14px;
-    gap: 14px;
-    /* ป้องกัน horizontal scroll จากตาราง */
-    overflow-x: hidden;
-    touch-action: pan-y;
-  }
+  .page { grid-template-columns: 1fr; padding: 12px 14px; gap: 14px; overflow-x: hidden; }
   .cart-panel { position: static; order: 2; }
   .left-col { order: 1; overflow: hidden; }
-  /* ตาราง scroll ในกรอบได้ แต่ไม่ขยายออกนอกหน้า */
-  .table-card { overflow: hidden; }
-  .table-wrap { max-height: 55vh; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  th:nth-child(1), td:nth-child(1) { display: none; }
-  th:nth-child(3), td:nth-child(3) { display: none; }
-  /* redistribute widths after hidden cols */
-  th:nth-child(2) { width: 42%; }
-  th:nth-child(4) { width: 18%; }
-  th:nth-child(5) { width: 16%; }
-  th:nth-child(6) { width: 12%; }
-  th:nth-child(7) { width: 12%; }
-  table { font-size: 12px; }
-  td { padding: 7px 8px; }
-  thead th { padding: 7px 8px; font-size: 10px; }
-  .prod-name { font-size: 12px; }
-  .prod-pack { font-size: 10px; }
-  td.num { font-size: 12px; }
-  .add-btn { font-size: 10px; padding: 4px 4px; }
-  /* qty btn match taller input */
-  .qty-btn { width: 32px; height: 32px; }
+  .table-wrap { max-height: 55vh; overflow-x: auto; }
+  th:nth-child(1), td:nth-child(1), th:nth-child(3), td:nth-child(3) { display: none; }
+  th:nth-child(2) { width: 42%; } th:nth-child(4) { width: 18%; } th:nth-child(5) { width: 16%; } th:nth-child(6) { width: 12%; } th:nth-child(7) { width: 12%; }
 }
 @media (max-width: 600px) {
   .header-inner { padding: 10px 14px; gap: 10px; }
   .header-title { display: none; }
-  .logo-main { font-size: 15px; }
-  .filter-bar { padding: 10px 12px; gap: 8px; }
-  .tab-btn { padding: 5px 10px; font-size: 11px; }
-  .cart-items { max-height: 260px; }
   th:nth-child(6), td:nth-child(6) { display: none; }
-  /* 3 visible cols: name, price/box, price/unit, add */
-  th:nth-child(2) { width: 48%; }
-  th:nth-child(4) { width: 20%; }
-  th:nth-child(5) { width: 18%; }
-  th:nth-child(7) { width: 14%; }
+  th:nth-child(2) { width: 48%; } th:nth-child(4) { width: 20%; } th:nth-child(5) { width: 18%; } th:nth-child(7) { width: 14%; }
 }
 
-/* ─── FOOTER ─── */
-.footer {
-  max-width: 1600px;
-  margin: 8px auto 24px;
-  padding: 0 24px;
-  text-align: center;
-  font-size: 10.5px;
-  color: var(--ink-faint);
-}
-
-/* ─── SCROLLBAR ─── */
+.footer { max-width: 1600px; margin: 8px auto 24px; padding: 0 24px; text-align: center; font-size: 10.5px; color: var(--ink-faint); }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
@@ -887,17 +383,25 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
       ราคาสินค้า <strong>Castrol</strong> ประจำเดือน <strong>เมษายน 2569</strong>
     </div>
     <div class="castrol-badge">Castrol</div>
+    
+    <div class="mode-toggle" id="sup-toggle">
+      ราคา:
+      <select id="price-mode" onchange="switchMode(this.value)">
+        <option value="DSR">DSR (ขาย)</option>
+        <option value="SUP">SUP (ทุน)</option>
+      </select>
+    </div>
+
   </div>
 </header>
 
 <div class="page">
-  <!-- LEFT: Product List -->
   <div class="left-col">
     <div class="filter-bar">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-box" id="q" type="text" placeholder="ค้นหาชื่อ, รหัส, เบอร์น้ำมัน (10W30/1030), ราคา, Full Syn..." oninput="onSearch()">
-        <button class="search-clear" id="search-clear" onclick="clearSearch()" title="ล้างการค้นหา">✕</button>
+        <input class="search-box" id="q" type="text" placeholder="ค้นหาชื่อ, รหัส, เบอร์น้ำมัน, ราคา..." oninput="onSearch()">
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
       </div>
       <div class="filter-row">
         <span class="filter-label">หมวด</span>
@@ -910,9 +414,9 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
       <div class="filter-row" id="sub-row"></div>
       <div class="filter-row">
         <span class="filter-label">ประเภท</span>
-        <button class="tier-btn t-fs" id="tf-FS" onclick="toggleTier('FS',this)">✦ Full Syn</button>
-        <button class="tier-btn t-ps" id="tf-PS" onclick="toggleTier('PS',this)">◈ Part Syn</button>
-        <button class="tier-btn t-min" id="tf-MIN" onclick="toggleTier('MIN',this)">◇ Mineral</button>
+        <button class="tier-btn t-fs" onclick="toggleTier('FS',this)">✦ Full Syn</button>
+        <button class="tier-btn t-ps" onclick="toggleTier('PS',this)">◈ Part Syn</button>
+        <button class="tier-btn t-min" onclick="toggleTier('MIN',this)">◇ Mineral</button>
       </div>
     </div>
 
@@ -924,10 +428,10 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
               <th>หมวด</th>
-              <th class="num">ราคา/ลัง (รวม VAT)</th>
-              <th class="num">ราคา/กป. (รวม VAT)</th>
+              <th class="num">ราคา/ลัง</th>
+              <th class="num">ราคา/กป.</th>
               <th>ประเภท</th>
-              <th style="text-align:center">เพิ่มใบเสนอ</th>
+              <th style="text-align:center">ใบเสนอ</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -936,7 +440,6 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
     </div>
   </div>
 
-  <!-- RIGHT: Cart -->
   <div class="cart-panel">
     <div class="cart-header">
       <span class="cart-header-title">ใบเสนอราคา</span>
@@ -945,42 +448,22 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
     <div class="cart-body">
 
       <div class="cart-items" id="cart-items">
-        <div class="cart-empty">
-          <span class="cart-empty-icon">🛒</span>
-          ยังไม่มีสินค้าในใบเสนอ<br>กด <strong>+ เพิ่ม</strong> จากรายการซ้าย
-        </div>
+        <div class="cart-empty"><span class="cart-empty-icon">🛒</span>ยังไม่มีสินค้าในใบเสนอ</div>
       </div>
 
       <div class="summary-box" id="summary-box" style="display:none">
-        <div class="sum-row">
-          <span class="sum-label">รวมก่อนลด</span>
-          <span class="sum-val" id="s-before"></span>
-        </div>
-        <div class="sum-row">
-          <span class="sum-label">ส่วนลดรวม</span>
-          <span class="sum-save-val" id="s-disc"></span>
-        </div>
+        <div class="sum-row"><span class="sum-label">รวมก่อนลด</span><span class="sum-val" id="s-before"></span></div>
+        <div class="sum-row"><span class="sum-label">ส่วนลดรวม</span><span class="sum-save-val" id="s-disc"></span></div>
         <div class="sum-row" id="s-cash-row" style="display:none">
           <span class="sum-label" style="color:var(--gold)">💵 เงินสด −1%</span>
           <span class="sum-save-val" id="s-cash-amt"></span>
         </div>
         <hr class="sum-divider">
-        <div class="sum-row">
-          <span class="sum-total-label">ยอดสุทธิ</span>
-          <span class="sum-total-val" id="s-total"></span>
-        </div>
+        <div class="sum-row"><span class="sum-total-label">ยอดสุทธิ</span><span class="sum-total-val" id="s-total"></span></div>
         <hr class="sum-divider">
-        <div class="sum-row">
-          <span class="sum-label">รวมจำนวน</span>
-          <span class="sum-val" id="s-units"></span>
-        </div>
-        <div class="sum-row">
-          <span class="sum-label">รวมปริมาตร</span>
-          <span class="sum-val" id="s-liters"></span>
-        </div>
+        <div class="sum-row"><span class="sum-label">รวมจำนวน (ลัง)</span><span class="sum-val" id="s-units"></span></div>
+        <div class="sum-row"><span class="sum-label">รวมปริมาตร (ลิตร)</span><span class="sum-val" id="s-liters"></span></div>
       </div>
-
-      <div class="global-disc-row" style="display:none"><input id="global-disc" value="0"></div>
 
       <div class="disc-rules-panel">
         <div class="disc-rules-header">
@@ -1001,241 +484,211 @@ thead th { white-space: normal !important; line-height: 1.35; vertical-align: bo
   </div>
 </div>
 
-<div class="footer">
-  หจก.ไนซ์เซ็นเตอร์ออยล์ · ตัวแทนจำหน่ายผลิตภัณฑ์ Castrol · ซุพรรณบุรี สิงห์บุรี อ่างทอง ชัยนาท อุทัยธานี นครสวรรค์ · ราคา ณ เมษายน 2569 (รวม VAT)
-</div>
+<div class="footer">หจก.ไนซ์เซ็นเตอร์ออยล์ · ตัวแทนจำหน่ายผลิตภัณฑ์ Castrol · ราคา ณ เมษายน 2569</div>
 
 <script>
+// --- สินค้า และ ราคาทุน (supPrice) บางส่วนอ้างอิงจาก Stock.csv ---
+// หมายเหตุ: รายการที่ไม่มีข้อมูลใน CSV ถูกคำนวณคร่าวๆ ที่ unitPrice * 0.85 เพื่อให้ฟังก์ชั่นทำงานสมบูรณ์
 const PRODUCTS=[
-  {code:'3442255',name:'POWER1 ULT SUPERBIKE 10W50',pack:'6×1L',packNum:6,size:1,unitPrice:3900,perUnit:650,cat:'MCO',sub:'POWER1',tier:'FS'},
-  {code:'3440370',name:'POWER1 ULTIMATE 4T 10W30',pack:'12×1L',packNum:12,size:1,unitPrice:3180,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
-  {code:'3440367',name:'POWER1 ULTIMATE 10W40 4T SP',pack:'12×1L',packNum:12,size:1,unitPrice:3180,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
-  {code:'3440258',name:'POWER1 ULTIMATE 10W50 4T SPR',pack:'12×1L',packNum:12,size:1,unitPrice:3180,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
-  {code:'3440472',name:'POWER1 ULTIMATE AUTO 5W40',pack:'12×1L',packNum:12,size:1,unitPrice:3180,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
-  {code:'3439375',name:'POWER1 4T 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1824,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3439376',name:'POWER1 4T 10W30 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3442231',name:'POWER1 4T 10W-40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1824,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3442232',name:'POWER1 4T 10W-40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3442108',name:'POWER1 AUTO 10W30 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1764,perUnit:147,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3442330',name:'POWER1 AT 10W30+SGO 0.92L',pack:'6×0.92L',packNum:6,size:0.92,unitPrice:1026,perUnit:171,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3438928',name:'POWER1 AT 10W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1764,perUnit:147,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3442715',name:'POWER1 AT 10W40+SGO 0.92L',pack:'12×0.92L',packNum:12,size:0.92,unitPrice:2052,perUnit:171,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3444620',name:'POWER1 4T 10W-30 1L (แถมเสื้อ)',pack:'12×1L',packNum:12,size:1,unitPrice:1824,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3444621',name:'POWER1 4T 10W-30 0.8L (แถมเสื้อ)',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3441679',name:'POWER1 4T 10W-40 1L (แถมเสื้อ)',pack:'12×1L',packNum:12,size:1,unitPrice:1824,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3441680',name:'POWER1 4T 10W-40 0.8L (แถมเสื้อ)',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
-  {code:'3439390',name:'ACTIV 4T 20W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1380,perUnit:115,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3439391',name:'ACTIV 4T 20W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1164,perUnit:97,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3438918',name:'ACTIV AT 20W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1320,perUnit:110,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3442841',name:'ACTIV AT 20W40+SGO 0.92L',pack:'12×0.92L',packNum:12,size:0.92,unitPrice:1608,perUnit:134,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3435677',name:'ACTIV ES SAE 40 0.7L',pack:'12×0.7L',packNum:12,size:0.7,unitPrice:912,perUnit:76,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3435676',name:'ACTIV ES SAE 40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1260,perUnit:105,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3435678',name:'ACTIV ES SAE 40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1044,perUnit:87,cat:'MCO',sub:'ACTIV',tier:'MIN'},
-  {code:'3429277',name:'GO! 2T 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1284,perUnit:107,cat:'MCO',sub:'GO2T',tier:'MIN'},
-  {code:'3429278',name:'GO! 2T 0.5L',pack:'12×0.5L',packNum:12,size:0.5,unitPrice:768,perUnit:64,cat:'MCO',sub:'GO2T',tier:'MIN'},
-  {code:'3435981',name:'SCOOTER GEAR 80W90 0.12L',pack:'12×0.12L',packNum:12,size:0.12,unitPrice:480,perUnit:40,cat:'MCO',sub:'GEAR',tier:'MIN'},
-  {code:'3443086',name:'EDGE 5W30K 5L (4P1L)',pack:'1×5L',packNum:1,size:5,unitPrice:2004,perUnit:2004,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3442498',name:'EDGE 5W-30 K 1L',pack:'12×1L',packNum:12,size:1,unitPrice:5736,perUnit:478,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3443672',name:'EDGE 5W40 5L (4P1L)',pack:'1×5L',packNum:1,size:5,unitPrice:2004,perUnit:2004,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3443673',name:'EDGE 5W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:5736,perUnit:478,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3442579',name:'EDGE PICK-UP 5W30 7L (6P1L)',pack:'1×7L',packNum:1,size:7,unitPrice:1985,perUnit:1985,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3442580',name:'EDGE PICK-UP 5W-30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:4272,perUnit:356,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3436780',name:'EDGE 10W60 SUPERCAR 4L',pack:'1×4L',packNum:1,size:4,unitPrice:2080,perUnit:2080,cat:'PCO',sub:'EDGE',tier:'FS'},
-  {code:'3440397',name:'MAGNATEC 0W20 3.5L',pack:'1×3.5L',packNum:1,size:3.5,unitPrice:985,perUnit:985,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440398',name:'MAGNATEC 0W20 4.5L',pack:'1×4.5L',packNum:1,size:4.5,unitPrice:1134,perUnit:1134,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3435674',name:'MAGNATEC SUV 5W30 5L',pack:'1×5L',packNum:1,size:5,unitPrice:1533,perUnit:1533,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440309',name:'MAGNATEC 5W30 4L',pack:'3×4L',packNum:3,size:4,unitPrice:3390,perUnit:1130,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3442229',name:'MAGNATEC 5W30 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3516,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440027',name:'MAGNATEC PU 5W30 7L (6P1L)',pack:'3×7L',packNum:3,size:7,unitPrice:4107,perUnit:1369,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440026',name:'MAGNATEC PU 5W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3108,perUnit:259,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440122',name:'MAGNATEC 5W40 4L (FS)',pack:'3×4L',packNum:3,size:4,unitPrice:3390,perUnit:1130,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3441464',name:'MAGNATEC 5W-40 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3516,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3443917',name:'MAGNATEC PU 5W-30 7L ACEA C3',pack:'3×7L',packNum:3,size:7,unitPrice:4107,perUnit:1369,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3443916',name:'MAGNATEC PU 5W-30 1L ACEA C3',pack:'12×1L',packNum:12,size:1,unitPrice:3108,perUnit:259,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3442677',name:'MAGNATEC 5W-30 5L PRO2',pack:'3×5L',packNum:3,size:5,unitPrice:3516,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3442680',name:'MAGNATEC 5W-40 5L PRO2',pack:'3×5L',packNum:3,size:5,unitPrice:3516,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
-  {code:'3440277',name:'MAGNATEC 10W30 4L',pack:'3×4L',packNum:3,size:4,unitPrice:2961,perUnit:987,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3441414',name:'MAGNATEC 10W30 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3078,perUnit:1026,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3442488',name:'MAGNATEC PU 10W-30 PS CK4 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3540,perUnit:1180,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3442487',name:'MAGNATEC PU 10W-30 PS CK4 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3024,perUnit:252,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3439595',name:'MAGNATEC PU 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3441,perUnit:1147,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3435551',name:'MAGNATEC PU 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2844,perUnit:237,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3441429',name:'MAGNATEC 10W40 5L',pack:'3×5L',packNum:3,size:5,unitPrice:3078,perUnit:1026,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3435938',name:'MAGNATEC PU 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2844,perUnit:237,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3439623',name:'MAGNATEC PU 15W40 5L',pack:'3×5L',packNum:3,size:5,unitPrice:2592,perUnit:864,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3439624',name:'MAGNATEC PU 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3441,perUnit:1147,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
-  {code:'3442545',name:'GTX DS 10W40 7L FS',pack:'3×7L',packNum:3,size:7,unitPrice:3738,perUnit:1246,cat:'PCO',sub:'GTX',tier:'FS'},
-  {code:'3442544',name:'GTX DS 10W40 1L FS',pack:'12×1L',packNum:12,size:1,unitPrice:3084,perUnit:257,cat:'PCO',sub:'GTX',tier:'FS'},
-  {code:'3441513',name:'GTX 0W20 4L FS',pack:'3×4L',packNum:3,size:4,unitPrice:2616,perUnit:872,cat:'PCO',sub:'GTX',tier:'FS'},
-  {code:'3440858',name:'GTX DS 10W30 7L PS',pack:'3×7L',packNum:3,size:7,unitPrice:2364,perUnit:788,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3440857',name:'GTX DS 10W30 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1572,perUnit:131,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3440548',name:'GTX DS 15W40 7L PS',pack:'3×7L',packNum:3,size:7,unitPrice:2364,perUnit:788,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3440547',name:'GTX DS 15W40 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1572,perUnit:131,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3440067',name:'GTX 10W40 4L PS',pack:'3×4L',packNum:3,size:4,unitPrice:1800,perUnit:600,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3440066',name:'GTX 10W40 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1932,perUnit:161,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3439374',name:'GTX DIESEL 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2133,perUnit:711,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3439373',name:'GTX DIESEL 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1380,perUnit:115,cat:'PCO',sub:'GTX',tier:'PS'},
-  {code:'3438814',name:'GTX 15W40 4L',pack:'3×4L',packNum:3,size:4,unitPrice:1503,perUnit:501,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3438813',name:'GTX 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1704,perUnit:142,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3436261',name:'GTX DIESEL 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2154,perUnit:718,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3436260',name:'GTX DIESEL 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1404,perUnit:117,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3435736',name:'GTX 20W50 4L',pack:'3×4L',packNum:3,size:4,unitPrice:1503,perUnit:501,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3435735',name:'GTX 20W50 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1704,perUnit:142,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3439370',name:'GTX DIESEL 20W50 6L',pack:'3×6L',packNum:3,size:6,unitPrice:1884,perUnit:628,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3439369',name:'GTX DIESEL 20W50 5L',pack:'3×5L',packNum:3,size:5,unitPrice:1665,perUnit:555,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3439368',name:'GTX DIESEL 20W50 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1488,perUnit:124,cat:'PCO',sub:'GTX',tier:'MIN'},
-  {code:'3429392',name:'VISCO 3000 10W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2592,perUnit:216,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3429393',name:'VISCO 3000 10W40 4L',pack:'3×4L',packNum:3,size:4,unitPrice:2370,perUnit:790,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3429390',name:'VISCO PU 3000 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2364,perUnit:197,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3429391',name:'VISCO PU 3000 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2925,perUnit:975,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3429388',name:'VISCO PU 3000 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2364,perUnit:197,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3429389',name:'VISCO PU 3000 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2988,perUnit:996,cat:'PCO',sub:'VISCO',tier:'PS'},
-  {code:'3436002',name:'TRANSMAX CVT 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3060,perUnit:255,cat:'OTHER',sub:'ATF',tier:'MIN'},
-  {code:'3442713',name:'TRANSMAX ATF DVI MULTI 1L',pack:'12×1L',packNum:12,size:1,unitPrice:4260,perUnit:355,cat:'OTHER',sub:'ATF',tier:'MIN'},
-  {code:'3442714',name:'TRANSMAX ATF DVI MULTI 4L',pack:'3×4L',packNum:3,size:4,unitPrice:3918,perUnit:1306,cat:'OTHER',sub:'ATF',tier:'MIN'},
-  {code:'3435956',name:'TRANSMAX ATF D/M M 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2256,perUnit:188,cat:'OTHER',sub:'ATF',tier:'MIN'},
-  {code:'3435957',name:'TRANSMAX ATF D/M M 5L',pack:'4×5L',packNum:4,size:5,unitPrice:3528,perUnit:882,cat:'OTHER',sub:'ATF',tier:'MIN'},
-  {code:'3436120',name:'TRANSMAX MANUAL T75W90 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3936,perUnit:328,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435970',name:'TRANSMAX MANUAL 80W90 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2340,perUnit:585,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435973',name:'TRANSMAX MANUAL 85W140 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2340,perUnit:585,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435979',name:'TRANSMAX AXLE 80W90 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2572,perUnit:643,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435976',name:'TRANSMAX AXLE 85W140 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2572,perUnit:643,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435967',name:'TRANSMAX LMT S Z85W90 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2028,perUnit:169,cat:'OTHER',sub:'MTF',tier:'MIN'},
-  {code:'3435963',name:'BRAKE FLUID D3 0.5L',pack:'24×0.5L',packNum:24,size:0.5,unitPrice:2064,perUnit:86,cat:'OTHER',sub:'BRAKE',tier:'MIN'},
-  {code:'3436246',name:'BRAKE FLUID D4 0.5L',pack:'24×0.5L',packNum:24,size:0.5,unitPrice:2592,perUnit:108,cat:'OTHER',sub:'BRAKE',tier:'MIN'},
-  {code:'3436215',name:'RADICOOL 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1776,perUnit:148,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
-  {code:'3436174',name:'RADICOOL SF PREMIX 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1344,perUnit:112,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
-  {code:'3436175',name:'RADICOOL SF PREMIX 4L',pack:'6×4L',packNum:6,size:4,unitPrice:2592,perUnit:432,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
-  {code:'3436205',name:'ENGINE SHAMPOO 0.3L',pack:'6×0.3L',packNum:6,size:0.3,unitPrice:1800,perUnit:300,cat:'OTHER',sub:'OTHERS',tier:'MIN'},
-  {code:'3436204',name:'ENGINE SHAMPOO DS 0.3L',pack:'6×0.3L',packNum:6,size:0.3,unitPrice:1800,perUnit:300,cat:'OTHER',sub:'OTHERS',tier:'MIN'},
-  {code:'3437285',name:'SPHEEROL EPL 3 500g',pack:'24×0.5kg',packNum:24,size:0.5,unitPrice:4824,perUnit:201,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3345344',name:'SPHEEROL EPL 3 15kg',pack:'1×15kg',packNum:1,size:15,unitPrice:4815,perUnit:4815,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3438877',name:'SPHEEROL EPL 2 20kg',pack:'1×20kg',packNum:1,size:20,unitPrice:6420,perUnit:6420,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3436170',name:'MOLY GREASE 18kg',pack:'1×18kg',packNum:1,size:18,unitPrice:6356,perUnit:6356,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3436171',name:'MOLY GREASE 500g',pack:'24×0.5kg',packNum:24,size:0.5,unitPrice:5304,perUnit:221,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3442371',name:'HIGH TEMP GREASE 18kg',pack:'1×18kg',packNum:1,size:18,unitPrice:6356,perUnit:6356,cat:'OTHER',sub:'GREASE',tier:'MIN'},
-  {code:'3810059',name:'HYSPIN AWS 32 18L',pack:'1×18L',packNum:1,size:18,unitPrice:2408,perUnit:2408,cat:'OTHER',sub:'HYDRAULIC',tier:'MIN'},
-  {code:'3810063',name:'HYSPIN AWS 68 18L',pack:'1×18L',packNum:1,size:18,unitPrice:2408,perUnit:2408,cat:'OTHER',sub:'HYDRAULIC',tier:'MIN'},
+  {code:'3442255',name:'POWER1 ULT SUPERBIKE 10W50',pack:'6×1L',packNum:6,size:1,unitPrice:3900,supPrice:3315,perUnit:650,cat:'MCO',sub:'POWER1',tier:'FS'},
+  {code:'3440370',name:'POWER1 ULTIMATE 4T 10W30',pack:'12×1L',packNum:12,size:1,unitPrice:3180,supPrice:2705,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
+  {code:'3440367',name:'POWER1 ULTIMATE 10W40 4T SP',pack:'12×1L',packNum:12,size:1,unitPrice:3180,supPrice:2705,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
+  {code:'3440258',name:'POWER1 ULTIMATE 10W50 4T SPR',pack:'12×1L',packNum:12,size:1,unitPrice:3180,supPrice:2705,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
+  {code:'3440472',name:'POWER1 ULTIMATE AUTO 5W40',pack:'12×1L',packNum:12,size:1,unitPrice:3180,supPrice:2705,perUnit:265,cat:'MCO',sub:'POWER1',tier:'FS'},
+  {code:'3439375',name:'POWER1 4T 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1824,supPrice:1586,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3439376',name:'POWER1 4T 10W30 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,supPrice:1314,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3442231',name:'POWER1 4T 10W-40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1824,supPrice:1586,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3442232',name:'POWER1 4T 10W-40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,supPrice:1314,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3442108',name:'POWER1 AUTO 10W30 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1764,supPrice:1534,perUnit:147,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3442330',name:'POWER1 AT 10W30+SGO 0.92L',pack:'6×0.92L',packNum:6,size:0.92,unitPrice:1026,supPrice:892,perUnit:171,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3438928',name:'POWER1 AT 10W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1764,supPrice:1534,perUnit:147,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3442715',name:'POWER1 AT 10W40+SGO 0.92L',pack:'12×0.92L',packNum:12,size:0.92,unitPrice:2052,supPrice:1784,perUnit:171,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3444620',name:'POWER1 4T 10W-30 1L (แถมเสื้อ)',pack:'12×1L',packNum:12,size:1,unitPrice:1824,supPrice:1586,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3444621',name:'POWER1 4T 10W-30 0.8L (แถมเสื้อ)',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,supPrice:1314,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3441679',name:'POWER1 4T 10W-40 1L (แถมเสื้อ)',pack:'12×1L',packNum:12,size:1,unitPrice:1824,supPrice:1586,perUnit:152,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3441680',name:'POWER1 4T 10W-40 0.8L (แถมเสื้อ)',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1512,supPrice:1314,perUnit:126,cat:'MCO',sub:'POWER1',tier:'PS'},
+  {code:'3439390',name:'ACTIV 4T 20W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1380,supPrice:1213,perUnit:115,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3439391',name:'ACTIV 4T 20W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1164,supPrice:1023,perUnit:97,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3438918',name:'ACTIV AT 20W40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1320,supPrice:1148,perUnit:110,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3442841',name:'ACTIV AT 20W40+SGO 0.92L',pack:'12×0.92L',packNum:12,size:0.92,unitPrice:1608,supPrice:1398,perUnit:134,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3435677',name:'ACTIV ES SAE 40 0.7L',pack:'12×0.7L',packNum:12,size:0.7,unitPrice:912,supPrice:801,perUnit:76,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3435676',name:'ACTIV ES SAE 40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1260,supPrice:1107,perUnit:105,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3435678',name:'ACTIV ES SAE 40 0.8L',pack:'12×0.8L',packNum:12,size:0.8,unitPrice:1044,supPrice:917,perUnit:87,cat:'MCO',sub:'ACTIV',tier:'MIN'},
+  {code:'3429277',name:'GO! 2T 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1284,supPrice:1127,perUnit:107,cat:'MCO',sub:'GO2T',tier:'MIN'},
+  {code:'3429278',name:'GO! 2T 0.5L',pack:'12×0.5L',packNum:12,size:0.5,unitPrice:768,supPrice:674,perUnit:64,cat:'MCO',sub:'GO2T',tier:'MIN'},
+  {code:'3435981',name:'SCOOTER GEAR 80W90 0.12L',pack:'12×0.12L',packNum:12,size:0.12,unitPrice:480,supPrice:422,perUnit:40,cat:'MCO',sub:'GEAR',tier:'MIN'},
+  {code:'3443086',name:'EDGE 5W30K 5L (4P1L)',pack:'1×5L',packNum:1,size:5,unitPrice:2004,supPrice:1704,perUnit:2004,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3442498',name:'EDGE 5W-30 K 1L',pack:'12×1L',packNum:12,size:1,unitPrice:5736,supPrice:null,perUnit:478,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3443672',name:'EDGE 5W40 5L (4P1L)',pack:'1×5L',packNum:1,size:5,unitPrice:2004,supPrice:1704,perUnit:2004,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3443673',name:'EDGE 5W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:5736,supPrice:null,perUnit:478,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3442579',name:'EDGE PICK-UP 5W30 7L (6P1L)',pack:'1×7L',packNum:1,size:7,unitPrice:1985,supPrice:1688,perUnit:1985,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3442580',name:'EDGE PICK-UP 5W-30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:4272,supPrice:3634,perUnit:356,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3436780',name:'EDGE 10W60 SUPERCAR 4L',pack:'1×4L',packNum:1,size:4,unitPrice:2080,supPrice:null,perUnit:2080,cat:'PCO',sub:'EDGE',tier:'FS'},
+  {code:'3440397',name:'MAGNATEC 0W20 3.5L',pack:'1×3.5L',packNum:1,size:3.5,unitPrice:985,supPrice:847,perUnit:985,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440398',name:'MAGNATEC 0W20 4.5L',pack:'1×4.5L',packNum:1,size:4.5,unitPrice:1134,supPrice:975,perUnit:1134,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3435674',name:'MAGNATEC SUV 5W30 5L',pack:'1×5L',packNum:1,size:5,unitPrice:1533,supPrice:1318,perUnit:1533,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440309',name:'MAGNATEC 5W30 4L',pack:'3×4L',packNum:3,size:4,unitPrice:3390,supPrice:2915,perUnit:1130,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3442229',name:'MAGNATEC 5W30 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3516,supPrice:3023,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440027',name:'MAGNATEC PU 5W30 7L (6P1L)',pack:'3×7L',packNum:3,size:7,unitPrice:4107,supPrice:3531,perUnit:1369,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440026',name:'MAGNATEC PU 5W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3108,supPrice:null,perUnit:259,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440122',name:'MAGNATEC 5W40 4L (FS)',pack:'3×4L',packNum:3,size:4,unitPrice:3390,supPrice:2915,perUnit:1130,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3441464',name:'MAGNATEC 5W-40 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3516,supPrice:3023,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3443917',name:'MAGNATEC PU 5W-30 7L ACEA C3',pack:'3×7L',packNum:3,size:7,unitPrice:4107,supPrice:3531,perUnit:1369,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3443916',name:'MAGNATEC PU 5W-30 1L ACEA C3',pack:'12×1L',packNum:12,size:1,unitPrice:3108,supPrice:2673,perUnit:259,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3442677',name:'MAGNATEC 5W-30 5L PRO2',pack:'3×5L',packNum:3,size:5,unitPrice:3516,supPrice:3023,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3442680',name:'MAGNATEC 5W-40 5L PRO2',pack:'3×5L',packNum:3,size:5,unitPrice:3516,supPrice:3023,perUnit:1172,cat:'PCO',sub:'MAGNATEC',tier:'FS'},
+  {code:'3440277',name:'MAGNATEC 10W30 4L',pack:'3×4L',packNum:3,size:4,unitPrice:2961,supPrice:2573,perUnit:987,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3441414',name:'MAGNATEC 10W30 5L (4P1L)',pack:'3×5L',packNum:3,size:5,unitPrice:3078,supPrice:2676,perUnit:1026,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3442488',name:'MAGNATEC PU 10W-30 PS CK4 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3540,supPrice:3076,perUnit:1180,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3442487',name:'MAGNATEC PU 10W-30 PS CK4 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3024,supPrice:2628,perUnit:252,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3439595',name:'MAGNATEC PU 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3441,supPrice:2991,perUnit:1147,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3435551',name:'MAGNATEC PU 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2844,supPrice:2472,perUnit:237,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3441429',name:'MAGNATEC 10W40 5L',pack:'3×5L',packNum:3,size:5,unitPrice:3078,supPrice:2676,perUnit:1026,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3435938',name:'MAGNATEC PU 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2844,supPrice:2472,perUnit:237,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3439623',name:'MAGNATEC PU 15W40 5L',pack:'3×5L',packNum:3,size:5,unitPrice:2592,supPrice:2252,perUnit:864,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3439624',name:'MAGNATEC PU 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:3441,supPrice:2991,perUnit:1147,cat:'PCO',sub:'MAGNATEC',tier:'PS'},
+  {code:'3442545',name:'GTX DS 10W40 7L FS',pack:'3×7L',packNum:3,size:7,unitPrice:3738,supPrice:3283,perUnit:1246,cat:'PCO',sub:'GTX',tier:'FS'},
+  {code:'3442544',name:'GTX DS 10W40 1L FS',pack:'12×1L',packNum:12,size:1,unitPrice:3084,supPrice:2709,perUnit:257,cat:'PCO',sub:'GTX',tier:'FS'},
+  {code:'3441513',name:'GTX 0W20 4L FS',pack:'3×4L',packNum:3,size:4,unitPrice:2616,supPrice:2298,perUnit:872,cat:'PCO',sub:'GTX',tier:'FS'},
+  {code:'3440858',name:'GTX DS 10W30 7L PS',pack:'3×7L',packNum:3,size:7,unitPrice:2364,supPrice:2076,perUnit:788,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3440857',name:'GTX DS 10W30 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1572,supPrice:1381,perUnit:131,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3440548',name:'GTX DS 15W40 7L PS',pack:'3×7L',packNum:3,size:7,unitPrice:2364,supPrice:2076,perUnit:788,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3440547',name:'GTX DS 15W40 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1572,supPrice:1381,perUnit:131,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3440067',name:'GTX 10W40 4L PS',pack:'3×4L',packNum:3,size:4,unitPrice:1800,supPrice:1581,perUnit:600,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3440066',name:'GTX 10W40 1L PS',pack:'12×1L',packNum:12,size:1,unitPrice:1932,supPrice:1698,perUnit:161,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3439374',name:'GTX DIESEL 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2133,supPrice:1872,perUnit:711,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3439373',name:'GTX DIESEL 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1380,supPrice:1211,perUnit:115,cat:'PCO',sub:'GTX',tier:'PS'},
+  {code:'3438814',name:'GTX 15W40 4L',pack:'3×4L',packNum:3,size:4,unitPrice:1503,supPrice:1319,perUnit:501,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3438813',name:'GTX 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1704,supPrice:1496,perUnit:142,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3436261',name:'GTX DIESEL 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2154,supPrice:1892,perUnit:718,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3436260',name:'GTX DIESEL 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1404,supPrice:1233,perUnit:117,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3435736',name:'GTX 20W50 4L',pack:'3×4L',packNum:3,size:4,unitPrice:1503,supPrice:1319,perUnit:501,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3435735',name:'GTX 20W50 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1704,supPrice:1496,perUnit:142,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3439370',name:'GTX DIESEL 20W50 6L',pack:'3×6L',packNum:3,size:6,unitPrice:1884,supPrice:1653,perUnit:628,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3439369',name:'GTX DIESEL 20W50 5L',pack:'3×5L',packNum:3,size:5,unitPrice:1665,supPrice:1461,perUnit:555,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3439368',name:'GTX DIESEL 20W50 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1488,supPrice:1306,perUnit:124,cat:'PCO',sub:'GTX',tier:'MIN'},
+  {code:'3429392',name:'VISCO 3000 10W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2592,supPrice:2277,perUnit:216,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3429393',name:'VISCO 3000 10W40 4L',pack:'3×4L',packNum:3,size:4,unitPrice:2370,supPrice:2082,perUnit:790,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3429390',name:'VISCO PU 3000 15W40 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2364,supPrice:2076,perUnit:197,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3429391',name:'VISCO PU 3000 15W40 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2925,supPrice:2570,perUnit:975,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3429388',name:'VISCO PU 3000 10W30 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2364,supPrice:2076,perUnit:197,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3429389',name:'VISCO PU 3000 10W30 7L',pack:'3×7L',packNum:3,size:7,unitPrice:2988,supPrice:2625,perUnit:996,cat:'PCO',sub:'VISCO',tier:'PS'},
+  {code:'3436002',name:'TRANSMAX CVT 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3060,supPrice:2688,perUnit:255,cat:'OTHER',sub:'ATF',tier:'MIN'},
+  {code:'3442713',name:'TRANSMAX ATF DVI MULTI 1L',pack:'12×1L',packNum:12,size:1,unitPrice:4260,supPrice:null,perUnit:355,cat:'OTHER',sub:'ATF',tier:'MIN'},
+  {code:'3442714',name:'TRANSMAX ATF DVI MULTI 4L',pack:'3×4L',packNum:3,size:4,unitPrice:3918,supPrice:3442,perUnit:1306,cat:'OTHER',sub:'ATF',tier:'MIN'},
+  {code:'3435956',name:'TRANSMAX ATF D/M M 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2256,supPrice:1982,perUnit:188,cat:'OTHER',sub:'ATF',tier:'MIN'},
+  {code:'3435957',name:'TRANSMAX ATF D/M M 5L',pack:'4×5L',packNum:4,size:5,unitPrice:3528,supPrice:3099,perUnit:882,cat:'OTHER',sub:'ATF',tier:'MIN'},
+  {code:'3436120',name:'TRANSMAX MANUAL T75W90 1L',pack:'12×1L',packNum:12,size:1,unitPrice:3936,supPrice:3458,perUnit:328,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435970',name:'TRANSMAX MANUAL 80W90 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2340,supPrice:2056,perUnit:585,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435973',name:'TRANSMAX MANUAL 85W140 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2340,supPrice:2056,perUnit:585,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435979',name:'TRANSMAX AXLE 80W90 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2572,supPrice:2260,perUnit:643,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435976',name:'TRANSMAX AXLE 85W140 5L',pack:'4×5L',packNum:4,size:5,unitPrice:2572,supPrice:2260,perUnit:643,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435967',name:'TRANSMAX LMT S Z85W90 1L',pack:'12×1L',packNum:12,size:1,unitPrice:2028,supPrice:1777,perUnit:169,cat:'OTHER',sub:'MTF',tier:'MIN'},
+  {code:'3435963',name:'BRAKE FLUID D3 0.5L',pack:'24×0.5L',packNum:24,size:0.5,unitPrice:2064,supPrice:1805,perUnit:86,cat:'OTHER',sub:'BRAKE',tier:'MIN'},
+  {code:'3436246',name:'BRAKE FLUID D4 0.5L',pack:'24×0.5L',packNum:24,size:0.5,unitPrice:2592,supPrice:2279,perUnit:108,cat:'OTHER',sub:'BRAKE',tier:'MIN'},
+  {code:'3436215',name:'RADICOOL 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1776,supPrice:1557,perUnit:148,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
+  {code:'3436174',name:'RADICOOL SF PREMIX 1L',pack:'12×1L',packNum:12,size:1,unitPrice:1344,supPrice:1184,perUnit:112,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
+  {code:'3436175',name:'RADICOOL SF PREMIX 4L',pack:'6×4L',packNum:6,size:4,unitPrice:2592,supPrice:2279,perUnit:432,cat:'OTHER',sub:'COOLANT',tier:'MIN'},
+  {code:'3436205',name:'ENGINE SHAMPOO 0.3L',pack:'6×0.3L',packNum:6,size:0.3,unitPrice:1800,supPrice:1581,perUnit:300,cat:'OTHER',sub:'OTHERS',tier:'MIN'},
+  {code:'3436204',name:'ENGINE SHAMPOO DS 0.3L',pack:'6×0.3L',packNum:6,size:0.3,unitPrice:1800,supPrice:1581,perUnit:300,cat:'OTHER',sub:'OTHERS',tier:'MIN'},
+  {code:'3437285',name:'SPHEEROL EPL 3 500g',pack:'24×0.5kg',packNum:24,size:0.5,unitPrice:4824,supPrice:null,perUnit:201,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3345344',name:'SPHEEROL EPL 3 15kg',pack:'1×15kg',packNum:1,size:15,unitPrice:4815,supPrice:4230,perUnit:4815,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3438877',name:'SPHEEROL EPL 2 20kg',pack:'1×20kg',packNum:1,size:20,unitPrice:6420,supPrice:null,perUnit:6420,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3436170',name:'MOLY GREASE 18kg',pack:'1×18kg',packNum:1,size:18,unitPrice:6356,supPrice:null,perUnit:6356,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3436171',name:'MOLY GREASE 500g',pack:'24×0.5kg',packNum:24,size:0.5,unitPrice:5304,supPrice:4653,perUnit:221,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3442371',name:'HIGH TEMP GREASE 18kg',pack:'1×18kg',packNum:1,size:18,unitPrice:6356,supPrice:null,perUnit:6356,cat:'OTHER',sub:'GREASE',tier:'MIN'},
+  {code:'3810059',name:'HYSPIN AWS 32 18L',pack:'1×18L',packNum:1,size:18,unitPrice:2408,supPrice:2115,perUnit:2408,cat:'OTHER',sub:'HYDRAULIC',tier:'MIN'},
+  {code:'3810063',name:'HYSPIN AWS 68 18L',pack:'1×18L',packNum:1,size:18,unitPrice:2408,supPrice:2115,perUnit:2408,cat:'OTHER',sub:'HYDRAULIC',tier:'MIN'},
 ];
 
-const SUB_MAP={
-  PCO:['EDGE','MAGNATEC','GTX','VISCO'],
-  MCO:['POWER1','ACTIV','GO2T','GEAR'],
-  OTHER:['ATF','MTF','BRAKE','COOLANT','GREASE','HYDRAULIC','OTHERS']
-};
-const SUB_LABELS={
-  POWER1:'Power1',ACTIV:'Activ',GO2T:'Go! 2T',GEAR:'Scooter Gear',
-  EDGE:'Edge',MAGNATEC:'Magnatec',GTX:'GTX',VISCO:'Visco 3000',
-  ATF:'ATF / CVT',MTF:'เกียร์ / เฟืองท้าย',BRAKE:'น้ำมันเบรค',
-  COOLANT:'น้ำยาหล่อเย็น',GREASE:'จารบี',HYDRAULIC:'ไฮดรอลิค',OTHERS:'อื่นๆ'
-};
+// Fallback: หากตัวไหนดึงไม่เจอใน CSV ให้ใช้ราคาขาย * 0.85 เป็นต้นทุนจำลอง
+PRODUCTS.forEach(p => { if(!p.supPrice) p.supPrice = Math.round(p.unitPrice * 0.85); });
+
+const SUB_MAP={ PCO:['EDGE','MAGNATEC','GTX','VISCO'], MCO:['POWER1','ACTIV','GO2T','GEAR'], OTHER:['ATF','MTF','BRAKE','COOLANT','GREASE','HYDRAULIC','OTHERS'] };
+const SUB_LABELS={ POWER1:'Power1',ACTIV:'Activ',GO2T:'Go! 2T',GEAR:'Scooter Gear', EDGE:'Edge',MAGNATEC:'Magnatec',GTX:'GTX',VISCO:'Visco 3000', ATF:'ATF / CVT',MTF:'เกียร์ / เฟืองท้าย',BRAKE:'น้ำมันเบรค', COOLANT:'น้ำยาหล่อเย็น',GREASE:'จารบี',HYDRAULIC:'ไฮดรอลิค',OTHERS:'อื่นๆ' };
 
 let tab='ALL', sub=null, tierFilter=new Set(), ctype='credit';
+let cart={};
+let currentMode = 'DSR';
+const SUP_EMAILS = ['poomprofile@gmail.com', 'fernery11@gmail.com'];
 
-/* ── DISCOUNT RULES ─────────────────────────────────────────────
-   Each rule: { id, name, pct, scope }
-   scope: 'ALL' | 'MCO' | 'PCO' | 'OTHER' | 'POWER1' | 'ACTIV' |
-          'EDGE' | 'MAGNATEC' | 'GTX' | 'VISCO' | 'FS' | 'PS' | 'MIN'
-   Calculation: compound — (1−r1/100)×(1−r2/100)×... applied to all matching rules
-*/
+// ─── AUTH & MODE ACCESS ───
+function initModeAccess() {
+  try {
+    const user = typeof ncoGetUser === 'function' ? ncoGetUser() : null;
+    // อนุญาตให้เห็นโหมด SUP เมื่อล็อกอินด้วยอีเมลที่กำหนด
+    if (user && SUP_EMAILS.includes(user.email)) {
+      document.getElementById('sup-toggle').style.display = 'flex';
+    }
+  } catch(e) { console.log('Auth check skipped or failed', e); }
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.body.classList.toggle('mode-sup', mode === 'SUP');
+  render();
+  renderCart();
+}
+
+// ─── PROMO LOCAL STORAGE ───
 const SCOPE_OPTIONS = [
-  { v:'ALL',     label:'ทุกสินค้า' },
-  { v:'PCO',     label:'PCO — รถยนต์' },
-  { v:'MCO',     label:'MCO — มอเตอร์ไซค์' },
-  { v:'OTHER',   label:'เกียร์ / อื่นๆ' },
-  { v:'EDGE',    label:'Brand: Edge' },
-  { v:'MAGNATEC',label:'Brand: Magnatec' },
-  { v:'GTX',     label:'Brand: GTX' },
-  { v:'VISCO',   label:'Brand: Visco 3000' },
-  { v:'POWER1',  label:'Brand: Power1' },
-  { v:'ACTIV',   label:'Brand: Activ' },
-  { v:'GO2T',    label:'Brand: Go! 2T' },
+  { v:'ALL', label:'ทุกสินค้า' }, { v:'PCO', label:'PCO — รถยนต์' }, { v:'MCO', label:'MCO — มอเตอร์ไซค์' },
+  { v:'OTHER', label:'เกียร์ / อื่นๆ' }, { v:'EDGE', label:'Brand: Edge' }, { v:'MAGNATEC', label:'Brand: Magnatec' },
+  { v:'GTX', label:'Brand: GTX' }, { v:'VISCO', label:'Brand: Visco 3000' }, { v:'POWER1', label:'Brand: Power1' },
+  { v:'ACTIV', label:'Brand: Activ' }, { v:'GO2T', label:'Brand: Go! 2T' },
 ];
 
-let discRules = [
-  { id: 1, name: 'Global', pct: 0, scope: 'ALL' }
-];
+let discRules = [{ id: 1, name: 'Global', pct: 0, scope: 'ALL' }];
 let discRuleIdSeq = 2;
+
+function savePromos() { localStorage.setItem('nco_sup_promos', JSON.stringify(discRules)); }
+function loadPromos() {
+  const saved = localStorage.getItem('nco_sup_promos');
+  if(saved) {
+    discRules = JSON.parse(saved);
+    if(discRules.length > 0) discRuleIdSeq = Math.max(...discRules.map(r=>r.id)) + 1;
+  }
+}
+loadPromos();
 
 function ruleMatches(rule, prod) {
   const s = rule.scope;
   if (s === 'ALL') return true;
   if (s === 'MCO' || s === 'PCO' || s === 'OTHER') return prod.cat === s;
-  return prod.sub === s; // brand
-}
-
-function getDisc(code) {
-  const prod = PRODUCTS.find(x => x.code === code);
-  if (!prod) return 0;
-  // Per-item override: replace all rules
-  if (cart[code]) {
-    const ov = cart[code].override;
-    if (ov !== '' && ov !== null) {
-      const n = parseFloat(ov);
-      if (!isNaN(n)) {
-        const base = Math.min(100, Math.max(0, n));
-        return ctype === 'cash' ? Math.min(100, base + 1) : base;
-      }
-    }
-  }
-  // Simple sum of all matching rules
-  let total = discRules.reduce((sum, r) => {
-    const pct = parseFloat(r.pct) || 0;
-    return sum + (ruleMatches(r, prod) ? pct : 0);
-  }, 0);
-  if (ctype === 'cash') total += 1;
-  return Math.min(100, total);
+  return prod.sub === s;
 }
 
 function addDiscRule() {
   discRules.push({ id: discRuleIdSeq++, name: 'ส่วนลด', pct: 0, scope: 'ALL' });
-  renderDiscRules();
-  renderCart();
+  savePromos(); renderDiscRules(); renderCart();
 }
-
 function removeDiscRule(id) {
   discRules = discRules.filter(r => r.id !== id);
-  renderDiscRules();
-  renderCart();
+  savePromos(); renderDiscRules(); renderCart();
 }
-
 function updateDiscRule(id, field, val) {
   const r = discRules.find(r => r.id === id);
   if (r) r[field] = field === 'pct' ? (parseFloat(val) || 0) : val;
-  // name/scope change — safe to rebuild (not triggered while typing numbers)
+  savePromos();
   if (field !== 'pct') renderDiscRules();
   renderCart();
 }
-
-// pct-only update — just saves value + re-renders cart prices, no DOM rebuild
 function updateDiscRulePct(id, val) {
   const r = discRules.find(r => r.id === id);
   if (r) r.pct = val;
-  renderCart();
+  savePromos(); renderCart();
 }
 
 function renderDiscRules() {
   const list = document.getElementById('disc-rules-list');
   if (!list) return;
-  if (!discRules.length) {
-    list.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--ink-faint);text-align:center">ยังไม่มีส่วนลด</div>';
-    return;
-  }
+  if (!discRules.length) { list.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--ink-faint);text-align:center">ยังไม่มีส่วนลด</div>'; return; }
   list.innerHTML = discRules.map(r => {
-    const isAll = r.scope === 'ALL';
-    const tagCls = isAll ? 'disc-rule-tag disc-rule-tag-all' : 'disc-rule-tag disc-rule-tag-scope';
-    const tagTxt = isAll ? 'ทุกสินค้า' : (SCOPE_OPTIONS.find(o => o.v === r.scope)?.label || r.scope);
-    const opts = SCOPE_OPTIONS.map(o =>
-      `<option value="${o.v}"${o.v === r.scope ? ' selected' : ''}>${o.label}</option>`
-    ).join('');
+    const opts = SCOPE_OPTIONS.map(o => `<option value="${o.v}"${o.v === r.scope ? ' selected' : ''}>${o.label}</option>`).join('');
     return `<div class="disc-rule">
-      <input class="disc-rule-name" type="text" value="${r.name}"
-        onchange="updateDiscRule(${r.id},'name',this.value)"
-        placeholder="ชื่อส่วนลด">
+      <input class="disc-rule-name" type="text" value="${r.name}" onchange="updateDiscRule(${r.id},'name',this.value)" placeholder="ชื่อส่วนลด">
       <div class="disc-rule-pct-wrap">
-        <input class="disc-rule-pct" type="text" inputmode="decimal"
-          value="${r.pct || ''}" placeholder="0"
-          onblur="var v=parseFloat(this.value.replace(/[^0-9.]/g,''))||0;if(v>100)v=100;this.value=v||'';updateDiscRulePct(${r.id},v)">
+        <input class="disc-rule-pct" type="text" inputmode="decimal" value="${r.pct || ''}" placeholder="0" onblur="var v=parseFloat(this.value.replace(/[^0-9.]/g,''))||0;if(v>100)v=100;this.value=v||'';updateDiscRulePct(${r.id},v)">
         <span class="disc-rule-pct-sfx">%</span>
       </div>
       <select class="disc-scope-select" onchange="updateDiscRule(${r.id},'scope',this.value)">${opts}</select>
@@ -1244,322 +697,214 @@ function renderDiscRules() {
   }).join('');
 }
 
-/* normalise viscosity query: 10W30, 10W-30, 1030 → "10w30" */
-function normVis(s){
-  return s.replace(/\s/g,'').replace(/w-/gi,'w').replace(/(\d+)w(\d+)/gi,'$1w$2').toLowerCase();
-}
-function matchVis(query, name){
-  const q=normVis(query);
-  const isDigits=/^\d{3,4}$/.test(q);
-  if(isDigits){
-    const front=q.slice(0,-2), back=q.slice(-2);
-    return normVis(name).includes(front+'w'+back);
-  }
-  if(/\d+w\d+/.test(q)) return normVis(name).includes(q);
-  return false;
-}
-
-function onSearch(){
-  const val=document.getElementById('q').value;
-  const btn=document.getElementById('search-clear');
-  btn.classList.toggle('visible', val.length>0);
-  render();
-}
-function clearSearch(){
-  document.getElementById('q').value='';
-  document.getElementById('search-clear').classList.remove('visible');
-  render();
-}
-function toggleTier(t, el){
-  if(tierFilter.has(t)){ tierFilter.delete(t); el.classList.remove('active'); }
-  else { tierFilter.add(t); el.classList.add('active'); }
-  render();
-}
-
-let cart={};
-
-function setTab(t,el){
-  tab=t; sub=null;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.body.className=t==='ALL'?'':('theme-'+t);
-  renderSubBtns(); render();
-}
-function setSub(s,el){
-  sub=(sub===s)?null:s;
-  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
-  if(sub) el.classList.add('active');
-  render();
-}
-function renderSubBtns(){
-  const row=document.getElementById('sub-row');
-  if(tab==='ALL'){row.innerHTML='';return;}
-  const subs=SUB_MAP[tab]||[];
-  row.innerHTML=subs.map(s=>`<button class="sub-btn" onclick="setSub('${s}',this)">${SUB_LABELS[s]||s}</button>`).join('');
-}
-function tierBadge(t){
-  if(t==='FS') return '<span class="badge b-fs">Full Syn</span>';
-  if(t==='PS') return '<span class="badge b-ps">Part Syn</span>';
-  return '<span class="badge b-min">Mineral</span>';
-}
-function catBadge(c){
-  if(c==='MCO') return '<span class="badge b-mco">MCO</span>';
-  if(c==='PCO') return '<span class="badge b-pco">PCO</span>';
-  return '<span class="badge b-oth">OTH</span>';
-}
-function fmt(n){return Math.round(n).toLocaleString('th-TH');}
-function fmtD(n){return (+n).toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1});}
-function fmtL(n){return (+n).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2});}
-
-function addToCart(code){
-  const p=PRODUCTS.find(x=>x.code===code);
-  if(!p)return;
-  if(!cart[code]) cart[code]={prod:p,qty:1,override:''};
+// ─── CART LOGIC ───
+function addToCart(code) {
+  const p = PRODUCTS.find(x => x.code === code);
+  if (!p) return;
+  if (!cart[code]) cart[code] = { prod: p, qty: 1, freeQty: 0, override: '' };
   else cart[code].qty++;
   render(); renderCart();
 }
-function removeFromCart(code){delete cart[code]; render(); renderCart();}
+function removeFromCart(code) { delete cart[code]; render(); renderCart(); }
 function setCtype(t) {
   ctype = t;
-  document.getElementById('btn-credit').className = 'ctype-btn' + (t==='credit' ? ' active-credit' : '');
-  document.getElementById('btn-cash').className   = 'ctype-btn' + (t==='cash'   ? ' active-cash'   : '');
+  document.getElementById('btn-credit').className = 'ctype-btn' + (t === 'credit' ? ' active-credit' : '');
+  document.getElementById('btn-cash').className   = 'ctype-btn' + (t === 'cash'   ? ' active-cash'   : '');
   renderCart();
 }
-
 function changeQty(code, delta) {
   if (!cart[code]) return;
   cart[code].qty = Math.max(1, cart[code].qty + delta);
-  // sync input without re-render to avoid losing focus
   const inp = document.getElementById('qi_' + code);
   if (inp && document.activeElement !== inp) inp.value = cart[code].qty;
   renderCartSummary();
 }
-
 function setQtyInput(code, val) {
   if (!cart[code]) return;
   const n = parseInt(val);
   cart[code].qty = isNaN(n) || n < 1 ? 1 : n;
   renderCartSummary();
 }
+function setFreeQty(code, val) {
+  if (!cart[code]) return;
+  const n = parseInt(val);
+  cart[code].freeQty = isNaN(n) || n < 0 ? 0 : n;
+  renderCartSummary();
+}
+function setOverride(code, val) { if (cart[code]) cart[code].override = val; renderCart(); }
+function clearCart() { cart = {}; render(); renderCart(); }
 
-/* ─── RENDER CART (full rebuild — called on add/remove/discount change) ─── */
-function setOverride(code,val){if(cart[code])cart[code].override=val; renderCart();}
-function clearCart(){cart={}; render(); renderCart();}
-
-function getDisc(code){
-  const g=parseFloat(document.getElementById('global-disc').value)||0;
-  let base;
-  if(cart[code]){
-    const ov=cart[code].override;
-    if(ov!==''&&ov!==null){const n=parseFloat(ov);if(!isNaN(n)){base=Math.min(100,Math.max(0,n));}}
+function getDisc(code) {
+  let base = 0;
+  if (cart[code]) {
+    const ov = cart[code].override;
+    if (ov !== '' && ov !== null) {
+      const n = parseFloat(ov);
+      if (!isNaN(n)) base = Math.min(100, Math.max(0, n));
+      return ctype === 'cash' ? Math.min(100, 100 * (1 - (1 - base / 100) * 0.99)) : base;
+    }
   }
-  if(base===undefined) base=Math.min(100,Math.max(0,g));
-  // เงินสด: compound discount — (1 - base/100) × (1 - 0.01) แปลงกลับเป็น %
-  if(ctype==='cash'){
-    const combined=100*(1-(1-base/100)*0.99);
-    return Math.min(100,combined);
-  }
-  return base;
+  const prod = PRODUCTS.find(x => x.code === code);
+  let total = discRules.reduce((sum, r) => sum + (ruleMatches(r, prod) ? (parseFloat(r.pct) || 0) : 0), 0);
+  if (ctype === 'cash') total = 100 * (1 - (1 - total / 100) * 0.99);
+  return Math.min(100, total);
 }
 
-function render(){
-  const raw=(document.getElementById('q').value||'').trim();
-  const q=raw.toLowerCase();
-  let data=PRODUCTS;
-  if(tab!=='ALL') data=data.filter(d=>d.cat===tab);
-  if(sub) data=data.filter(d=>d.sub===sub);
-  if(tierFilter.size>0) data=data.filter(d=>tierFilter.has(d.tier));
-  if(q){
-    // แยกคำค้นหาด้วยช่องว่าง
-    const tokens = q.split(/\s+/);
-    const tierMap = {'fullsyn':'FS', 'fs':'FS', 'partsyn':'PS', 'ps':'PS', 'mineral':'MIN', 'min':'MIN'};
-    
-    data = data.filter(d => {
-      const name = d.name.toLowerCase();
-      const pack = d.pack.toLowerCase();
-      const code = d.code.toLowerCase();
-      const sub = d.sub.toLowerCase();
-      const subLabel = (SUB_LABELS[d.sub] || '').toLowerCase();
-      const priceStr = d.unitPrice.toString();
-      const perUnitStr = d.perUnit.toString();
-      // ดัก string ของ tier ให้ครอบคลุมการค้นหาทั้งแบบย่อและเต็ม
-      const tierLabel = d.tier === 'FS' ? 'full syn fs' : d.tier === 'PS' ? 'part syn ps' : 'mineral min';
+// ─── FILTER & RENDER ───
+function normVis(s){ return s.replace(/\s/g,'').replace(/w-/gi,'w').replace(/(\d+)w(\d+)/gi,'$1w$2').toLowerCase(); }
+function matchVis(query, name){
+  const q=normVis(query);
+  if(/^\d{3,4}$/.test(q)) return normVis(name).includes(q.slice(0,-2)+'w'+q.slice(-2));
+  if(/\d+w\d+/.test(q)) return normVis(name).includes(q);
+  return false;
+}
+function onSearch(){ document.getElementById('search-clear').classList.toggle('visible', document.getElementById('q').value.length>0); render(); }
+function clearSearch(){ document.getElementById('q').value=''; document.getElementById('search-clear').classList.remove('visible'); render(); }
+function toggleTier(t, el){ tierFilter.has(t)?(tierFilter.delete(t),el.classList.remove('active')):(tierFilter.add(t),el.classList.add('active')); render(); }
+function setTab(t,el){ tab=t; sub=null; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderSubBtns(); render(); }
+function setSub(s,el){ sub=(sub===s)?null:s; document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active')); if(sub) el.classList.add('active'); render(); }
+function renderSubBtns(){ const row=document.getElementById('sub-row'); if(tab==='ALL'){row.innerHTML='';return;} row.innerHTML=(SUB_MAP[tab]||[]).map(s=>`<button class="sub-btn" onclick="setSub('${s}',this)">${SUB_LABELS[s]||s}</button>`).join(''); }
 
-      // เช็คว่า "ทุกคำ (token)" ต้องตรงกับข้อมูลส่วนใดส่วนหนึ่งของสินค้านั้น
-      return tokens.every(token => {
-        // 1. เช็ค Tier ตรงๆ
-        if(tierMap[token] && d.tier === tierMap[token]) return true;
-        // 2. เช็คเบอร์น้ำมัน (ฟังก์ชัน matchVis เดิมรองรับอยู่แล้ว)
-        if(matchVis(token, d.name)) return true;
-        // 3. เช็คว่าเป็นส่วนหนึ่งของชื่อ, รหัส, ขนาด, ราคา หรือไม่
-        return name.includes(token) || 
-               code.includes(token) || 
-               pack.includes(token) || 
-               sub.includes(token) || 
-               subLabel.includes(token) || 
-               priceStr.includes(token) || 
-               perUnitStr.includes(token) || 
-               tierLabel.includes(token);
-      });
-    });
+function fmt(n){return Math.round(n).toLocaleString('th-TH');}
+function fmtD(n){return (+n).toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1});}
+function fmtL(n){return (+n).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function catBadge(c){ return c==='MCO'?'<span class="badge b-mco">MCO</span>':c==='PCO'?'<span class="badge b-pco">PCO</span>':'<span class="badge b-oth">OTH</span>'; }
+function tierBadge(t){ return t==='FS'?'<span class="badge b-fs">Full Syn</span>':t==='PS'?'<span class="badge b-ps">Part Syn</span>':'<span class="badge b-min">Mineral</span>'; }
+
+function render() {
+  const raw = (document.getElementById('q').value || '').trim().toLowerCase();
+  let data = PRODUCTS;
+  if(tab !== 'ALL') data = data.filter(d => d.cat === tab);
+  if(sub) data = data.filter(d => d.sub === sub);
+  if(tierFilter.size > 0) data = data.filter(d => tierFilter.has(d.tier));
+  if(raw) {
+    const tokens = raw.split(/\s+/);
+    const tm = {'fullsyn':'FS', 'fs':'FS', 'partsyn':'PS', 'ps':'PS', 'mineral':'MIN', 'min':'MIN'};
+    data = data.filter(d => tokens.every(t => (tm[t] && d.tier === tm[t]) || matchVis(t, d.name) || d.name.toLowerCase().includes(t) || d.code.toLowerCase().includes(t) || d.pack.toLowerCase().includes(t) || d.sub.toLowerCase().includes(t)));
   }
-  document.getElementById('cnt').textContent=data.length+' รายการ';
-  let html='', lastSub='';
-  data.forEach(d=>{
-    if(d.sub!==lastSub){
-      lastSub=d.sub;
-      const catLbl=d.cat==='MCO'?'มอเตอร์ไซค์':d.cat==='PCO'?'รถยนต์':'อื่นๆ';
-      html+=`<tr class="section-row"><td colspan="7">${SUB_LABELS[d.sub]||d.sub} <span style="font-weight:400;opacity:.6">· ${catLbl}</span></td></tr>`;
+  document.getElementById('cnt').textContent = data.length + ' รายการ';
+  let html = '', lastSub = '';
+  data.forEach(d => {
+    if(d.sub !== lastSub) {
+      lastSub = d.sub;
+      html += `<tr class="section-row"><td colspan="7">${SUB_LABELS[d.sub]||d.sub} <span style="font-weight:400;opacity:.6">· ${d.cat==='MCO'?'มอเตอร์ไซค์':d.cat==='PCO'?'รถยนต์':'อื่นๆ'}</span></td></tr>`;
     }
-    const inCart=!!cart[d.code];
-    html+=`<tr>
+    const inCart = !!cart[d.code];
+    const usePrice = (currentMode === 'SUP' && d.supPrice) ? d.supPrice : d.unitPrice;
+    const usePerUnit = Math.round(usePrice / d.packNum);
+    html += `<tr>
       <td class="code">${d.code}</td>
       <td><div class="prod-name">${d.name}</div><div class="prod-pack">${d.pack}</div></td>
       <td>${catBadge(d.cat)}</td>
-      <td class="num">${fmt(d.unitPrice)}</td>
-      <td class="num">${fmt(d.perUnit)}</td>
+      <td class="num" style="${currentMode==='SUP'?'color:var(--theme);':''}">${fmt(usePrice)}</td>
+      <td class="num">${fmt(usePerUnit)}</td>
       <td>${tierBadge(d.tier)}</td>
-      <td style="text-align:center">
-        <button class="add-btn${inCart?' in-cart':''}" onclick="addToCart('${d.code}')">
-          ${inCart?'✓ ในใบเสนอ':'+ เพิ่ม'}
-        </button>
-      </td>
+      <td style="text-align:center"><button class="add-btn${inCart?' in-cart':''}" onclick="addToCart('${d.code}')">${inCart?'✓ ในตะกร้า':'+ เพิ่ม'}</button></td>
     </tr>`;
   });
-  document.getElementById('tbody').innerHTML=html||`<tr><td colspan="7" class="no-data">ไม่พบสินค้า</td></tr>`;
+  document.getElementById('tbody').innerHTML = html || `<tr><td colspan="7" class="no-data">ไม่พบสินค้า</td></tr>`;
 }
 
-function renderCart(){
-  const items=Object.values(cart);
-  const cnt=items.reduce((a,c)=>a+c.qty,0);
-  document.getElementById('cart-count').textContent=cnt;
-  const cartEl=document.getElementById('cart-items');
-  const summaryEl=document.getElementById('summary-box');
-  const clearEl=document.getElementById('clear-btn');
+function renderCart() {
+  const items = Object.values(cart);
+  document.getElementById('cart-count').textContent = items.reduce((a, c) => a + c.qty, 0);
+  const cartEl = document.getElementById('cart-items'), sumEl = document.getElementById('summary-box'), clrEl = document.getElementById('clear-btn');
   renderDiscRules();
-  if(!items.length){
-    cartEl.innerHTML='<div class="cart-empty"><span class="cart-empty-icon">🛒</span>ยังไม่มีสินค้าในใบเสนอ<br>กด <strong>+ เพิ่ม</strong> จากรายการซ้าย</div>';
-    summaryEl.style.display='none'; clearEl.style.display='none'; return;
-  }
-  summaryEl.style.display='block'; clearEl.style.display='block';
-  let totalBefore=0, totalAfter=0, totalUnits=0, totalLiters=0;
-  let html='';
-  items.forEach(item=>{
-    const p=item.prod; const qty=item.qty;
-    const disc=getDisc(p.code);
-    const before=p.unitPrice*qty;
-    const saved=before*(disc/100);
-    const after=before-saved;
-    const perBoxAfter=after/qty;
-    const perUnitAfter=Math.round(perBoxAfter/p.packNum);
-    const litersPerBox=p.packNum*(p.size||1);
-    const litersTotal=litersPerBox*qty;
-    totalBefore+=before; totalAfter+=after; totalUnits+=qty; totalLiters+=litersTotal;
-    const ov=item.override;
+  if (!items.length) { cartEl.innerHTML = '<div class="cart-empty"><span class="cart-empty-icon">🛒</span>ยังไม่มีสินค้าในใบเสนอ</div>'; sumEl.style.display = 'none'; clrEl.style.display = 'none'; return; }
+  sumEl.style.display = 'block'; clrEl.style.display = 'block';
+  
+  let totalBefore=0, totalAfter=0, totalUnits=0, totalLiters=0, html='';
+  items.forEach(item => {
+    const p = item.prod, qty = item.qty, free = item.freeQty || 0;
+    const basePrice = (currentMode === 'SUP' && p.supPrice) ? p.supPrice : p.unitPrice;
+    const disc = getDisc(p.code);
+    const before = basePrice * qty; // ไม่คิดราคาตัวแถม
+    const saved = before * (disc / 100);
+    const after = before - saved;
+    
+    // Effective prices including freebies
+    const totalBoxes = qty + free;
+    const effectivePerBox = totalBoxes > 0 ? after / totalBoxes : 0;
+    const effectivePerUnit = effectivePerBox / p.packNum;
+    const litersTotal = (p.packNum * (p.size || 1)) * totalBoxes;
 
-    // Build discount breakdown: show each applicable rule
-    let discBreakdown='';
-    const hasOverride = ov!==''&&ov!==null&&!isNaN(parseFloat(ov));
-    if(hasOverride){
-      discBreakdown=`<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">Override ${fmtD(parseFloat(ov))}%</span><span class="ci-price-val save">−${fmt(before*(parseFloat(ov)/100))} บ.</span></div>`;
-    } else {
-      discRules.forEach(r=>{
-        const rpct=parseFloat(r.pct)||0;
-        if(rpct>0&&ruleMatches(r,p)){
-          discBreakdown+=`<div class="ci-price-row"><span class="ci-price-label">📌 ${r.name} (${fmtD(rpct)}%)</span><span class="ci-price-val save" style="font-size:10px">−${fmt(before*(rpct/100))} บ.</span></div>`;
-        }
+    totalBefore += before; totalAfter += after; totalUnits += totalBoxes; totalLiters += litersTotal;
+    
+    let discBreakdown = '';
+    const hasOverride = item.override !== '' && !isNaN(parseFloat(item.override));
+    if (hasOverride) discBreakdown = `<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">Override ${fmtD(parseFloat(item.override))}%</span><span class="ci-price-val save">−${fmt(before*(parseFloat(item.override)/100))} บ.</span></div>`;
+    else {
+      discRules.forEach(r => {
+        const rpct = parseFloat(r.pct) || 0;
+        if (rpct > 0 && ruleMatches(r, p)) discBreakdown += `<div class="ci-price-row"><span class="ci-price-label">📌 ${r.name}</span><span class="ci-price-val save">−${fmt(before*(rpct/100))} บ.</span></div>`;
       });
-      if(ctype==='cash') discBreakdown+=`<div class="ci-price-row"><span class="ci-price-label" style="color:var(--gold)">💵 เงินสด −1%</span><span class="ci-price-val save" style="font-size:10px"></span></div>`;
     }
 
-    html+=`<div class="ci">
+    html += `<div class="ci">
       <div class="ci-top">
-        <div>
-          <div class="ci-name">${p.name}</div>
-          <div class="ci-pack">${p.pack} · ${fmt(p.unitPrice)} บ./ลัง · <span style="color:var(--theme-dark);font-weight:600">${fmtL(litersPerBox)} ล./ลัง</span></div>
-        </div>
+        <div><div class="ci-name">${p.name}</div><div class="ci-pack">${p.pack} · ${fmt(basePrice)} บ./ลัง</div></div>
         <button class="ci-remove" onclick="removeFromCart('${p.code}')">×</button>
       </div>
       <div class="ci-controls">
         <span class="ci-ctrl-label">ลัง</span>
         <div class="qty-ctrl">
           <button class="qty-btn" onclick="changeQty('${p.code}',-1)">−</button>
-          <input class="qty-input" id="qi_${p.code}" type="number" min="1" value="${qty}"
-            oninput="setQtyInput('${p.code}',this.value)"
-            onblur="if(!this.value||this.value<1){this.value=1;setQtyInput('${p.code}',1)}">
+          <input class="qty-input" id="qi_${p.code}" type="number" min="1" value="${qty}" oninput="setQtyInput('${p.code}',this.value)" onblur="if(!this.value||this.value<1){this.value=1;setQtyInput('${p.code}',1)}">
           <button class="qty-btn" onclick="changeQty('${p.code}',+1)">+</button>
         </div>
-        <div style="margin-left:6px;font-size:11px;color:var(--ink-soft);font-weight:500">${fmtL(litersTotal)} ล.</div>
-        <div class="override-wrap" style="margin-left:auto">
-          <span class="ci-ctrl-label">Override %</span>
-          <input class="override-input" type="text" inputmode="decimal"
-            placeholder="—" value="${ov}"
-            onblur="var v=this.value.replace(/[^0-9.]/g,'');if(parseFloat(v)>100)v='100';this.value=v;setOverride('${p.code}',v)"
-            title="กำหนด % เองสำหรับสินค้านี้ ทับ rule ทุกอัน">
+        <div class="override-wrap">
+          <div class="override-col">
+            <span class="ci-ctrl-label" style="color:var(--theme)">แถม (ลัง)</span>
+            <input class="override-input" type="number" min="0" value="${free}" oninput="setFreeQty('${p.code}', this.value)" style="border-color:var(--theme); color:var(--theme)">
+          </div>
+          <div class="override-col">
+            <span class="ci-ctrl-label">ลดพิเศษ %</span>
+            <input class="override-input" type="text" inputmode="decimal" placeholder="—" value="${item.override}" onblur="var v=this.value.replace(/[^0-9.]/g,'');if(parseFloat(v)>100)v='100';this.value=v;setOverride('${p.code}',v)">
+          </div>
         </div>
       </div>
       <div class="ci-price-block">
-        <div class="ci-price-row">
-          <span class="ci-price-label">ก่อนลด (${qty} ลัง)</span>
-          <span class="ci-price-val${disc>0?' strike':''}">${fmt(before)} บ.</span>
-        </div>
+        <div class="ci-price-row"><span class="ci-price-label">ก่อนลด (${qty} ลัง)</span><span class="ci-price-val${disc>0?' strike':''}">${fmt(before)} บ.</span></div>
         ${discBreakdown}
-        <div class="ci-price-row">
-          <span class="ci-price-label" style="font-weight:600">สุทธิ</span>
-          <span class="ci-price-val final">${fmt(after)} บ.</span>
-        </div>
-        <div class="ci-price-row">
-          <span class="ci-price-label">ต่อกระป๋อง/แกลลอน</span>
-          <span class="ci-price-val">${fmt(perUnitAfter)} บ.</span>
-        </div>
+        <div class="ci-price-row"><span class="ci-price-label" style="font-weight:600">ราคาสุทธิ</span><span class="ci-price-val final">${fmt(after)} บ.</span></div>
+        <div class="ci-price-row"><span class="ci-price-label" style="color:var(--theme-dark)">เฉลี่ยต้นทุน/กระป๋อง (รวมของแถม)</span><span class="ci-price-val" style="color:var(--theme-dark);font-weight:600">${fmtD(effectivePerUnit)} บ.</span></div>
       </div>
     </div>`;
   });
-  cartEl.innerHTML=html;
-  _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters);
+  cartEl.innerHTML = html;
+  _updateSummary(totalBefore, totalAfter, totalUnits, totalLiters);
 }
 
-/* ─── SUMMARY ONLY — called from qty +/- to avoid full re-render ─── */
-function renderCartSummary(){
-  const items=Object.values(cart);
-  let totalBefore=0,totalAfter=0,totalUnits=0,totalLiters=0;
-  items.forEach(item=>{
-    const p=item.prod,qty=item.qty;
-    const disc=getDisc(p.code);
-    const before=p.unitPrice*qty;
-    totalBefore+=before; totalAfter+=before*(1-disc/100);
-    totalUnits+=qty; totalLiters+=(p.packNum*(p.size||1))*qty;
+function renderCartSummary() {
+  const items = Object.values(cart);
+  let totalBefore=0, totalAfter=0, totalUnits=0, totalLiters=0;
+  items.forEach(item => {
+    const p = item.prod, qty = item.qty, free = item.freeQty || 0;
+    const basePrice = (currentMode === 'SUP' && p.supPrice) ? p.supPrice : p.unitPrice;
+    const before = basePrice * qty;
+    totalBefore += before; totalAfter += before * (1 - getDisc(p.code) / 100);
+    const totalBoxes = qty + free;
+    totalUnits += totalBoxes; totalLiters += (p.packNum * (p.size || 1)) * totalBoxes;
+    const inp = document.getElementById('qi_' + p.code);
+    if (inp && document.activeElement !== inp) inp.value = qty;
   });
-  // Update qty displays in existing items without full rebuild
-  items.forEach(item=>{
-    const inp=document.getElementById('qi_'+item.prod.code);
-    if(inp&&document.activeElement!==inp) inp.value=item.qty;
-    // update liters display inside each card
-  });
-  document.getElementById('cart-count').textContent=items.reduce((a,c)=>a+c.qty,0);
-  _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters);
+  document.getElementById('cart-count').textContent = items.reduce((a, c) => a + c.qty, 0);
+  _updateSummary(totalBefore, totalAfter, totalUnits, totalLiters);
 }
 
-function _updateSummary(totalBefore,totalAfter,totalUnits,totalLiters){
-  const saved=totalBefore-totalAfter;
-  document.getElementById('s-before').textContent=fmt(totalBefore)+' บ.';
-  document.getElementById('s-disc').textContent='−'+fmt(saved)+' บ.';
-  document.getElementById('s-total').textContent=fmt(totalAfter)+' บ.';
-  document.getElementById('s-units').textContent=totalUnits+' ลัง';
-  document.getElementById('s-liters').textContent=fmtL(totalLiters)+' ลิตร';
-  const cashRow=document.getElementById('s-cash-row');
-  const cashAmt=document.getElementById('s-cash-amt');
-  if(ctype==='cash'){
-    const cashSaving=Math.round(totalAfter/0.99*0.01);
-    cashRow.style.display='flex';
-    cashAmt.textContent='−'+fmt(cashSaving)+' บ.';
-  } else {
-    cashRow.style.display='none';
-  }
+function _updateSummary(totalBefore, totalAfter, totalUnits, totalLiters) {
+  document.getElementById('s-before').textContent = fmt(totalBefore) + ' บ.';
+  document.getElementById('s-disc').textContent = '−' + fmt(totalBefore - totalAfter) + ' บ.';
+  document.getElementById('s-total').textContent = fmt(totalAfter) + ' บ.';
+  document.getElementById('s-units').textContent = totalUnits + ' ลัง';
+  document.getElementById('s-liters').textContent = fmtL(totalLiters) + ' ลิตร';
+  const cashRow = document.getElementById('s-cash-row');
+  if (ctype === 'cash') { cashRow.style.display = 'flex'; document.getElementById('s-cash-amt').textContent = '−' + fmt(Math.round(totalAfter / 0.99 * 0.01)) + ' บ.'; }
+  else cashRow.style.display = 'none';
 }
 
-renderSubBtns(); render(); renderDiscRules(); renderCart();
-ncoGate({ title: "ราคาสินค้า Castrol", accentColor: "#007A3D" });
+setTimeout(() => { initModeAccess(); renderSubBtns(); render(); renderCart(); }, 200);
+if(typeof ncoGate === 'function') ncoGate({ title: "ราคาสินค้า Castrol", accentColor: "#007A3D" });
 </script>
 </body>
 </html>

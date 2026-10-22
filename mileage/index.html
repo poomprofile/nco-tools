@@ -3,145 +3,240 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>บันทึกไมล์ (ทดสอบ)</title>
-<!-- nco-tools/mileage/index.html — LIFF 2011953085-84eBr79k · API = GAS project nco-dsr-app (doPost) · R5 spike -->
+<title>บันทึกไมล์</title>
+<!-- nco-tools/mileage/index.html — LIFF 2011953085-84eBr79k · API = GAS project nco-dsr-app (doPost → Liff.js / Mileage.js) · R5 -->
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-:root{--o:#E8631A;--o-lite:#FEF0E7;--g:#007B40;--r:#C8102E;--ink:#1A1A1A;--ink3:#8A8A8A;--bg:#F7F5F2}
-*{box-sizing:border-box}
-body{margin:0;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--ink)}
-.top{background:var(--o);color:#fff;padding:16px;padding-top:max(16px,env(safe-area-inset-top))}
-.top b{font-size:19px}
-.wrap{padding:14px;max-width:520px;margin:0 auto}
-.step{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(0,0,0,.08)}
-.step h4{margin:0 0 6px;font-size:15px}
-.res{font-size:13px;white-space:pre-wrap;word-break:break-all}
-.ok{color:var(--g)} .bad{color:var(--r)} .mut{color:var(--ink3)}
-.btn{display:block;width:100%;border:0;border-radius:12px;padding:13px;font:inherit;font-size:16px;font-weight:600;background:var(--o);color:#fff;margin-top:8px}
-.btn.sec{background:var(--o-lite);color:var(--o)}
+:root{--o:#E8631A;--o-d:#C44E0E;--o-l:#FEF0E7;--g:#007B40;--g-l:#E2F4ED;--r:#C8102E;--y:#FFF6DB;--y-d:#8A5A00;--ink:#1A1A1A;--ink2:#4A4A4A;--ink3:#8A8A8A;--bg:#F7F5F2;--card:#fff;--line:rgba(0,0,0,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Sarabun',sans-serif;font-size:16px}
+.top{background:var(--o);color:#fff;padding:14px 16px 16px;padding-top:max(14px,env(safe-area-inset-top))}
+.top .t{font-size:13px;opacity:.9}.top b{font-size:20px}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.today{display:flex;gap:8px}
+.today div{flex:1;border-radius:10px;padding:8px 10px;background:var(--bg)}
+.today small{display:block;font-size:12px;color:var(--ink3)}
+.today b{font-size:17px}.today .done{background:var(--g-l)}.today .done b{color:var(--g)}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-top:10px}
+.seg button{flex:1;border:0;background:none;font:inherit;font-weight:600;padding:10px;border-radius:9px;color:var(--ink2)}
+.seg button.on{background:var(--o);color:#fff}
+.cam{position:relative;background:#000;border-radius:14px;overflow:hidden;min-height:200px}
+.cam video{display:block;width:100%}
+.frame{position:absolute;left:5%;width:90%;border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 2000px rgba(0,0,0,.4)}
+.hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;color:#fff;font-size:14px;text-shadow:0 1px 3px #000}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:15px;font:inherit;font-size:17px;font-weight:700;background:var(--o);color:#fff;margin-top:10px;text-align:center}
+.btn.sec{background:var(--o-l);color:var(--o-d);font-weight:600}
+.btn.ghost{background:none;color:var(--ink2);font-weight:600;padding:10px}
 .btn:disabled{opacity:.45}
-.cam{position:relative;background:#000;border-radius:12px;overflow:hidden;margin-top:8px}
-.cam video,.cam canvas{display:block;width:100%}
-.frame{position:absolute;left:10%;width:80%;border:3px solid #fff;border-radius:10px;box-shadow:0 0 0 2000px rgba(0,0,0,.45)}
-.hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;color:#fff;font-size:13px}
-img.pv{width:100%;border-radius:10px;margin-top:8px;background:#eee}
+.shot{width:100%;border-radius:12px;display:block;background:#222}
+.num{width:100%;font:inherit;font-size:38px;font-weight:700;text-align:center;letter-spacing:1px;border:2px solid var(--o);border-radius:12px;padding:8px;margin-top:10px;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;justify-content:center}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font:inherit;font-size:16px;font-weight:600}
+.chip.on{background:var(--o-l);border-color:var(--o);color:var(--o-d)}
+.mut{color:var(--ink3);font-size:13px;text-align:center;margin-top:8px}
+.warn{background:var(--y);color:var(--y-d);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14px}
+.err{background:#fdecee;color:var(--r);border-radius:10px;padding:12px;margin-bottom:12px;font-size:14px;word-break:break-word}
+.ok{text-align:center;padding:26px 8px}
+.ok .big{font-size:44px;font-weight:700;color:var(--g)}
+.spin{width:28px;height:28px;border:3px solid var(--o-l);border-top-color:var(--o);border-radius:50%;animation:sp .8s linear infinite;margin:18px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hide{display:none!important}
 </style>
 </head>
 <body>
-<div class="top"><b>📷 บันทึกไมล์ — ทดสอบระบบ</b><div style="font-size:13px;opacity:.9">ยังไม่บันทึกเลขไมล์จริง</div></div>
+<div class="top"><div class="t" id="hdrSub">Nice Center Oil · บันทึกไมล์</div><b id="hdrName">📷 บันทึกไมล์</b></div>
 <div class="wrap">
-  <div class="step"><h4>1. เปิดใน LINE</h4><div class="res" id="r1">กำลังเริ่ม…</div></div>
-  <div class="step"><h4>2. ตรวจตัวตนกับระบบ</h4><div class="res" id="r2">รอข้อ 1</div></div>
-  <div class="step"><h4>3. กล้อง + กรอบเล็ง</h4>
-    <div class="res" id="r3">แตะเปิดกล้อง แล้ววางเลขไมล์ให้อยู่ในกรอบ</div>
-    <div class="cam" id="cam" style="display:none"><video id="vid" playsinline autoplay muted></video><div class="frame" id="frm"></div><div class="hint">วางเลขไมล์ให้อยู่ในกรอบ</div></div>
-    <button class="btn" id="bCam" disabled>เปิดกล้อง</button>
-    <button class="btn" id="bShot" style="display:none">ถ่าย</button>
-    <label class="btn sec" style="text-align:center">หรือถ่ายด้วยกล้องเครื่อง<input id="file" type="file" accept="image/*" capture="environment" hidden></label>
-    <img class="pv" id="crop" style="display:none" alt="">
-  </div>
-  <div class="step"><h4>4. อัปโหลดรูป (Drive)</h4><div class="res" id="r4">รอรูปจากข้อ 3</div><img class="pv" id="pub" style="display:none" alt=""></div>
-  <div class="step"><h4>5. ส่งการ์ดเข้ากลุ่ม</h4><div class="res" id="r5">รอข้อ 4 · ต้องเปิดจากในกลุ่ม LINE</div><button class="btn" id="bSend" disabled>ส่งการ์ดทดสอบ</button></div>
-  <button class="btn sec" id="bCopy">คัดลอกผลทดสอบ (ส่งให้ภูมิ)</button>
+  <div id="err" class="err hide"></div>
+  <div id="vLoad"><div class="spin"></div><div class="mut">กำลังเปิด…</div></div>
+
+  <!-- 1 เลือกช่วง + ถ่าย -->
+  <section id="vCam" class="hide">
+    <div class="card">
+      <div class="today">
+        <div id="tdM"><small>ออกงาน</small><b>-</b></div>
+        <div id="tdE"><small>เลิกงาน</small><b>-</b></div>
+      </div>
+      <div class="seg"><button id="sM" onclick="setSes('morning')">ออกงาน</button><button id="sE" onclick="setSes('evening')">เลิกงาน</button></div>
+    </div>
+    <div class="cam" id="cam"><video id="vid" playsinline autoplay muted></video><div class="frame" id="frm"></div><div class="hint">ให้เลขไมล์อยู่ในกรอบ ไม่ต้องเป๊ะ</div></div>
+    <button class="btn" id="bShot" disabled>📸 ถ่าย</button>
+    <label class="btn sec">ใช้กล้องเครื่องแทน<input id="file" type="file" accept="image/*" capture="environment" hidden></label>
+  </section>
+
+  <!-- 2 ยืนยันเลข -->
+  <section id="vConfirm" class="hide">
+    <img class="shot" id="shot" alt="">
+    <div id="reading"><div class="spin"></div><div class="mut">กำลังอ่านเลขไมล์…</div></div>
+    <div id="pick" class="hide">
+      <div class="mut" id="pickHint"></div>
+      <input class="num" id="num" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="พิมพ์เลขไมล์">
+      <div class="chips" id="chips"></div>
+      <div class="mut" id="anchorTxt"></div>
+      <div id="warnBox" class="warn hide"></div>
+      <button class="btn" id="bSave">ยืนยัน <span id="sesTxt"></span></button>
+      <button class="btn ghost" onclick="retake()">ถ่ายใหม่</button>
+    </div>
+  </section>
+
+  <!-- 3 เสร็จ -->
+  <section id="vDone" class="hide">
+    <div class="card ok">
+      <div class="big">✓</div>
+      <div style="font-size:18px;font-weight:700;margin-top:6px" id="doneTxt"></div>
+      <div class="mut" id="doneSub"></div>
+    </div>
+    <button class="btn" onclick="liff.closeWindow()">ปิด</button>
+  </section>
 </div>
 <script>
 var LIFF_ID = '2011953085-84eBr79k';
 var API = 'https://script.google.com/macros/s/AKfycbwbTwQCqyN-AqpsZbBPQlH0buXw7y5JYnW7K80JedLyWma37-uBfz_1AblILRvr-9C1RA/exec';
-var FRAME = { x: .10, w: .80, ratio: 3 };   // กรอบกว้าง 80% ของภาพ อัตราส่วน 3:1 อยู่กลางภาพ
-var LOG = [], ME = null, IMG_URL = '', stream = null;
+var FRAME = { x: .05, w: .90, ratio: 2.5 };          // กรอบหลวม (Poom: เลขไมล์มักชิดเลขอื่น)
+var JUMP = 1000, DAY = 500;                          // ต้องตรงกับ Mileage.js
+var INIT = null, SES = 'morning', READ = null, stream = null, busy = false;
+var TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var SES_TH = { morning: 'ออกงาน', evening: 'เลิกงาน' };
 
 function $(i){ return document.getElementById(i); }
-function put(id, txt, cls){ var e = $(id); e.className = 'res ' + (cls || ''); e.textContent = txt; LOG.push('[' + id + '] ' + txt); }
+function show(v){ ['vLoad','vCam','vConfirm','vDone'].forEach(function(x){ $(x).classList.toggle('hide', x !== v); }); window.scrollTo(0, 0); }
+function fmt(n){ return Number(n).toLocaleString('en-US'); }
+function dTh(ymd){ var p = ymd.split('-').map(Number); return p[2] + ' ' + TH_M[p[1]-1]; }
+function err(m){ var e = $('err'); e.textContent = m; e.classList.remove('hide'); }
+function clearErr(){ $('err').classList.add('hide'); }
 function api(action, extra){
   var body = Object.assign({ action: action, idToken: liff.getIDToken() }, extra || {});
-  return fetch(API, { method: 'POST', body: JSON.stringify(body) })   // text/plain → ไม่มี CORS preflight
+  return fetch(API, { method: 'POST', body: JSON.stringify(body) })
     .then(function(r){ return r.json(); })
-    .then(function(j){ if (!j.ok) throw new Error(j.error); return j.data; });
+    .then(function(j){
+      if (j.ok) return j.data;
+      if (/^AUTH/.test(j.error)) { liff.logout(); liff.login(); }   // token หมดอายุ → login ใหม่
+      throw new Error(j.error);
+    });
 }
 
-// 1. LIFF
+// ── เริ่ม ────────────────────────────────────────────────────
 liff.init({ liffId: LIFF_ID }).then(function(){
   if (!liff.isLoggedIn()) { liff.login(); return; }
-  var c = liff.getContext() || {};
-  return liff.getProfile().then(function(p){
-    put('r1', 'OK · ' + p.displayName + '\nOS: ' + liff.getOS() + ' · ในแอป LINE: ' + liff.isInClient() +
-      ' · LINE ' + (liff.getLineVersion() || '-') + '\nเปิดจาก: ' + (c.type || '-') + (c.type === 'group' ? ' ✓' : ' (ต้องเป็น group ถึงส่งการ์ดได้)') +
-      '\nuserId: ' + p.userId, 'ok');
-    $('bCam').disabled = false;
-    return api('whoami').then(function(u){ ME = u; put('r2', 'OK · ระบบรู้จักว่าเป็น ' + u.name + ' (' + u.role + ')', 'ok'); },
-                              function(e){ put('r2', 'ไม่ผ่าน: ' + e.message, 'bad'); });
+  return api('mile.init').then(function(d){
+    INIT = d;
+    $('hdrName').textContent = '📷 ' + d.name + (d.vehicle ? ' · ' + d.vehicle : '');
+    $('hdrSub').textContent = 'บันทึกไมล์ · ' + dTh(d.today) + (d.role === 'test' ? ' · เครื่องทดสอบ (ไม่บันทึกจริง)' : '');
+    paintToday(); setSes(d.session); show('vCam'); startCam();
   });
-}).catch(function(e){ put('r1', 'เริ่ม LIFF ไม่ได้: ' + e.message, 'bad'); });
+}).catch(function(e){ show('vCam'); $('vCam').classList.add('hide'); err('เปิดไม่ได้: ' + e.message); });
 
-// 3. กล้อง (getUserMedia + กรอบเล็ง)
-function placeFrame(){
-  var v = $('vid'), f = $('frm'), h = v.clientWidth * FRAME.w / FRAME.ratio;
-  f.style.height = h + 'px'; f.style.top = (v.clientHeight - h) / 2 + 'px';
+function paintToday(){
+  [['tdM', INIT.todayMorning], ['tdE', INIT.todayEvening]].forEach(function(x){
+    var el = $(x[0]); el.classList.toggle('done', !!x[1]); el.querySelector('b').textContent = x[1] ? fmt(x[1]) + ' ✓' : '-';
+  });
 }
-$('bCam').onclick = function(){
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { put('r3', 'เครื่องนี้เปิดกล้องในแอปไม่ได้ (ไม่มี getUserMedia) — ใช้ปุ่มกล้องเครื่องแทน', 'bad'); return; }
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } }, audio: false })
+function setSes(s){ SES = s; $('sM').classList.toggle('on', s === 'morning'); $('sE').classList.toggle('on', s === 'evening'); }
+
+// ── กล้อง ────────────────────────────────────────────────────
+function startCam(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { $('cam').classList.add('hide'); $('bShot').classList.add('hide'); return; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
     .then(function(s){
-      stream = s; var v = $('vid'); v.srcObject = s; $('cam').style.display = 'block';
-      $('bCam').style.display = 'none'; $('bShot').style.display = 'block';
-      v.onloadedmetadata = function(){ placeFrame(); put('r3', 'กล้องในแอปใช้ได้ ✓ ' + v.videoWidth + '×' + v.videoHeight, 'ok'); };
-    }, function(e){ put('r3', 'เปิดกล้องในแอปไม่ได้: ' + e.name + ' ' + e.message + ' — ใช้ปุ่มกล้องเครื่องแทน', 'bad'); });
-};
-$('bShot').onclick = function(){ var v = $('vid'); cropFrom(v, v.videoWidth, v.videoHeight, 'live'); };
+      stream = s; var v = $('vid'); v.srcObject = s;
+      v.onloadedmetadata = function(){ placeFrame(); $('bShot').disabled = false; };
+    }, function(){ $('cam').classList.add('hide'); $('bShot').classList.add('hide'); });
+}
+function stopCam(){ if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; } }
+function placeFrame(){ var v = $('vid'), f = $('frm'), h = v.clientWidth * FRAME.w / FRAME.ratio; f.style.height = h + 'px'; f.style.top = (v.clientHeight - h) / 2 + 'px'; }
+window.addEventListener('resize', function(){ if (stream) placeFrame(); });
+$('bShot').onclick = function(){ var v = $('vid'); crop(v, v.videoWidth, v.videoHeight); };
 $('file').onchange = function(){
-  var f = this.files[0]; if (!f) return;
-  var img = new Image(); img.onload = function(){ cropFrom(img, img.naturalWidth, img.naturalHeight, 'file'); URL.revokeObjectURL(img.src); };
+  var f = this.files[0]; if (!f) return; this.value = '';
+  var img = new Image(); img.onload = function(){ crop(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(img.src); };
   img.src = URL.createObjectURL(f);
 };
-// ตัดเฉพาะในกรอบ → JPEG กว้างไม่เกิน 1200
-function cropFrom(src, W, H, how){
+// ตัดตามกรอบ ไม่ย่อ (เว้นกว้างเกิน 1600) — เลขจะชัดสุด
+function crop(src, W, H){
   var cw = W * FRAME.w, ch = cw / FRAME.ratio, cx = W * FRAME.x, cy = (H - ch) / 2;
-  var outW = Math.min(1200, Math.round(cw)), outH = Math.round(outW / FRAME.ratio);
-  var c = document.createElement('canvas'); c.width = outW; c.height = outH;
-  c.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, outW, outH);
-  var data = c.toDataURL('image/jpeg', .85);
-  $('crop').src = data; $('crop').style.display = 'block';
-  put('r3', 'ถ่ายแล้ว (' + how + ') ภาพเต็ม ' + W + '×' + H + ' → ตัดกรอบ ' + outW + '×' + outH + ' · ' + Math.round(data.length * .75 / 1024) + ' KB', 'ok');
-  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; $('cam').style.display = 'none'; $('bShot').style.display = 'none'; $('bCam').style.display = 'block'; }
-  upload(data);
+  var ow = Math.min(1600, Math.round(cw)), oh = Math.round(ow / FRAME.ratio);
+  var c = document.createElement('canvas'); c.width = ow; c.height = oh;
+  c.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, ow, oh);
+  var data = c.toDataURL('image/jpeg', .88);
+  stopCam(); clearErr();
+  $('shot').src = data; $('reading').classList.remove('hide'); $('pick').classList.add('hide');
+  $('sesTxt').textContent = SES_TH[SES]; show('vConfirm');
+  READ = null;
+  api('mile.read', { image: data, session: SES }).then(function(r){ READ = r; showPick(); },
+    function(e){ err('อ่านรูปไม่สำเร็จ: ' + e.message); READ = { candidates: [], fileId: '', url: '' }; showPick(); });
+}
+function retake(){ clearErr(); show('vCam'); startCam(); }
+
+// ── เลือก/แก้เลข ─────────────────────────────────────────────
+function showPick(){
+  $('reading').classList.add('hide'); $('pick').classList.remove('hide');
+  var c = READ.candidates || [];
+  $('num').value = c.length ? c[0].mile : '';
+  $('pickHint').textContent = c.length ? 'เลขที่อ่านได้ — ถ้าไม่ตรง แตะตัวเลือกหรือพิมพ์แก้' : 'อ่านเลขไม่ออก — พิมพ์เลขไมล์ตามรูป';
+  $('chips').innerHTML = c.slice(0, 3).map(function(x, i){ return '<button class="chip' + (i === 0 ? ' on' : '') + '" data-m="' + x.mile + '">' + fmt(x.mile) + '</button>'; }).join('') +
+    '<button class="chip" data-m="">พิมพ์เอง</button>';
+  [].forEach.call($('chips').children, function(b){ b.onclick = function(){
+    [].forEach.call($('chips').children, function(x){ x.classList.remove('on'); }); b.classList.add('on');
+    $('num').value = b.dataset.m; if (!b.dataset.m) $('num').focus(); checkWarn(); }; });
+  var a = INIT.anchor;
+  $('anchorTxt').textContent = a ? 'เลขล่าสุดที่ยืนยัน ' + fmt(a.mile) + ' (' + dTh(a.date) + ' ' + SES_TH[a.session] + ')' : '';
+  if (!c.length) $('num').focus();
+  checkWarn();
+}
+$('num').oninput = function(){ this.value = this.value.replace(/\D/g, '').slice(0, 7); checkWarn(); };
+function warnings(m){
+  var w = [], a = INIT.anchor;
+  if (!m) return w;
+  if (a && m < a.mile) w.push('น้อยกว่าเลขล่าสุด ' + fmt(a.mile));
+  if (a && m - a.mile > JUMP) w.push('มากกว่าเลขล่าสุด ' + fmt(m - a.mile) + ' กม.');
+  if (SES === 'evening' && INIT.todayMorning && m - INIT.todayMorning > DAY) w.push('วันนี้วิ่ง ' + fmt(m - INIT.todayMorning) + ' กม.');
+  return w;
+}
+function checkWarn(){
+  var m = parseInt($('num').value, 10), w = warnings(m), b = $('warnBox');
+  b.classList.toggle('hide', !w.length);
+  b.innerHTML = w.length ? '⚠️ ' + w.join('<br>⚠️ ') + '<br><small>ตรวจเลขกับรูปอีกครั้ง ถ้าถูกแล้วกดยืนยันได้</small>' : '';
+  $('bSave').disabled = !(m > 0);
 }
 
-// 4. อัปโหลด → Drive public → ลองแสดงจาก URL สาธารณะ
-function upload(data){
-  put('r4', 'กำลังอัปโหลด…', 'mut');
-  var t0 = Date.now();
-  api('spikeUpload', { image: data }).then(function(r){
-    put('r4', 'อัปโหลดแล้ว ' + ((Date.now() - t0) / 1000).toFixed(1) + ' วิ · กำลังเปิดรูปจากลิงก์สาธารณะ…', 'mut');
-    var img = $('pub'); img.style.display = 'block';
-    img.onload = function(){ IMG_URL = r.url; put('r4', 'รูปสาธารณะแสดงได้ ✓ (' + r.url + ')', 'ok'); $('bSend').disabled = false; };
-    img.onerror = function(){ put('r4', 'เปิดรูปจาก lh3 ไม่ได้ — ลอง uc?export=view', 'bad');
-      img.onerror = function(){ put('r4', 'เปิดรูปสาธารณะไม่ได้ทั้ง 2 แบบ', 'bad'); };
-      img.onload = function(){ IMG_URL = r.alt; put('r4', 'รูปแสดงได้ด้วย uc?export=view ✓', 'ok'); $('bSend').disabled = false; };
-      img.src = r.alt; };
-    img.src = r.url;
-  }, function(e){ put('r4', 'อัปโหลดไม่ผ่าน: ' + e.message, 'bad'); });
+// ── บันทึก + การ์ดเข้ากลุ่ม ──────────────────────────────────
+$('bSave').onclick = function(){ save(false); };
+function save(ack){
+  if (busy) return;
+  var m = parseInt($('num').value, 10); if (!(m > 0)) return;
+  var top = (READ.candidates || [])[0];
+  var w = warnings(m);
+  if (w.length && !ack && !confirm('เลขนี้ผิดปกติ:\n• ' + w.join('\n• ') + '\n\nยืนยันว่าเลข ' + fmt(m) + ' ถูกต้อง?')) return;
+  busy = true; $('bSave').disabled = true; $('bSave').textContent = 'กำลังบันทึก…';
+  api('mile.save', { session: SES, mile: m, fileId: READ.fileId, raw: top ? top.mile : '',
+                     source: top && top.mile === m ? 'vision' : 'manual', ack: true })
+    .then(function(r){ return sendCard(r, m).then(function(sent){ done(r, m, sent); }); })
+    .catch(function(e){ err('บันทึกไม่สำเร็จ: ' + e.message); })
+    .then(function(){ busy = false; $('bSave').disabled = false; $('bSave').innerHTML = 'ยืนยัน <span id="sesTxt">' + SES_TH[SES] + '</span>'; });
 }
-
-// 5. Flex card ในนาม DSR
-$('bSend').onclick = function(){
+function sendCard(r, m){
+  var ctx = liff.getContext() || {};
+  if (!READ.url || ['group', 'room', 'utou'].indexOf(ctx.type) < 0) return Promise.resolve(false);
   var now = new Date(), hm = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
-  var name = ME ? ME.name : 'ทดสอบ';
-  var msg = { type: 'flex', altText: '🚗 ' + name + ' ทดสอบบันทึกไมล์ ' + hm, contents: { type: 'bubble',
-    hero: { type: 'image', url: IMG_URL, size: 'full', aspectRatio: '3:1', aspectMode: 'cover' },
-    body: { type: 'box', layout: 'vertical', spacing: 'xs', contents: [
-      { type: 'text', text: '🚗 ' + name + ' · ออกงาน ' + hm + ' น.', weight: 'bold', size: 'md' },
-      { type: 'text', text: '123,456 กม. ✓', weight: 'bold', size: 'xl', color: '#E8631A' },
-      { type: 'text', text: 'ทดสอบระบบ — ไม่ใช่เลขจริง', size: 'xs', color: '#8A8A8A' } ] } } };
-  liff.sendMessages([msg]).then(function(){ put('r5', 'ส่งแล้ว ✓ — ดูในกลุ่มว่าการ์ด + รูปขึ้น และขึ้นในชื่อ ' + name, 'ok'); },
-    function(e){ put('r5', 'ส่งไม่ได้: ' + (e.code || '') + ' ' + e.message, 'bad'); });
-};
-
-$('bCopy').onclick = function(){
-  var t = 'LIFF spike ' + new Date().toLocaleString('th-TH') + '\n' + LOG.join('\n');
-  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ alert('คัดลอกแล้ว'); },
-    function(){ prompt('คัดลอกข้อความนี้', t); });
-};
+  var lines = [
+    { type: 'text', text: '🚗 ' + INIT.name + ' · ' + SES_TH[SES] + ' ' + hm + ' น.', weight: 'bold', size: 'md', wrap: true },
+    { type: 'text', text: fmt(m) + ' กม. ✓', weight: 'bold', size: 'xl', color: '#E8631A' } ];
+  if (r.distance) lines.push({ type: 'text', text: 'วันนี้วิ่ง ' + fmt(r.distance) + ' กม.', size: 'sm', color: '#4A4A4A' });
+  if (r.warnings && r.warnings.length) lines.push({ type: 'text', text: '⚠️ ' + r.warnings.join(' · ') + ' (ยืนยันแล้ว)', size: 'xs', color: '#8A5A00', wrap: true });
+  if (r.dryRun) lines.push({ type: 'text', text: 'ทดสอบระบบ — ไม่ได้บันทึกจริง', size: 'xs', color: '#8A8A8A' });
+  return liff.sendMessages([{ type: 'flex', altText: '🚗 ' + INIT.name + ' ' + SES_TH[SES] + ' ' + fmt(m) + ' กม.', contents: { type: 'bubble',
+    hero: { type: 'image', url: READ.url, size: 'full', aspectRatio: '5:2', aspectMode: 'cover' },
+    body: { type: 'box', layout: 'vertical', spacing: 'xs', contents: lines } } }])
+    .then(function(){ return true; }, function(){ return false; });
+}
+function done(r, m, sent){
+  $('doneTxt').textContent = (r.dryRun ? 'ทดสอบ · ' : '') + SES_TH[SES] + ' ' + fmt(m) + ' กม.';
+  $('doneSub').textContent = (r.distance ? 'วันนี้วิ่ง ' + fmt(r.distance) + ' กม. · ' : '') +
+    (sent ? 'ส่งการ์ดเข้ากลุ่มแล้ว' : 'บันทึกแล้ว (ไม่ได้ส่งการ์ด — เปิดจากลิงก์ในกลุ่มเลขไมล์)');
+  if (!r.dryRun) { if (SES === 'morning') INIT.todayMorning = m; else INIT.todayEvening = m; INIT.anchor = { mile: m, date: INIT.today, session: SES }; }
+  show('vDone');
+}
 </script>
 </body>
 </html>

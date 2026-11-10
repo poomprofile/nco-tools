@@ -54,6 +54,8 @@ html,body{touch-action:manipulation;margin:0;background:var(--bg);color:var(--in
 .spin{width:28px;height:28px;border:3px solid var(--o-l);border-top-color:var(--o);border-radius:50%;animation:sp .8s linear infinite;margin:18px auto}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E8631A;margin-right:4px;animation:blink 1s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
 </style>
 </head>
 <body>
@@ -81,8 +83,7 @@ html,body{touch-action:manipulation;margin:0;background:var(--bg);color:var(--in
   <!-- 2 ยืนยันเลข -->
   <section id="vConfirm" class="hide">
     <img class="shot" id="shot" alt="">
-    <div id="reading"><div class="spin"></div><div class="mut">กำลังอ่านเลขไมล์…</div></div>
-    <div id="pick" class="hide">
+    <div id="pick">
       <div class="mut" id="pickHint"></div>
       <input class="num" id="num" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="พิมพ์เลขไมล์">
       <div class="chips" id="chips"></div>
@@ -108,7 +109,7 @@ var LIFF_ID = '2011953085-84eBr79k';
 var API = 'https://script.google.com/macros/s/AKfycbwbTwQCqyN-AqpsZbBPQlH0buXw7y5JYnW7K80JedLyWma37-uBfz_1AblILRvr-9C1RA/exec';
 var FRAME = { x: .05, w: .90, ratio: 2.5 };          // กรอบหลวม (Poom: เลขไมล์มักชิดเลขอื่น)
 var JUMP = 1000, DAY = 500;                          // ต้องตรงกับ Mileage.js
-var INIT = null, SES = 'morning', READ = null, stream = null, busy = false;
+var INIT = null, SES = 'morning', READ = null, IMG = '', SHOT_T = 0, stream = null, busy = false;
 var TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 var SES_TH = { morning: 'เริ่มงาน', evening: 'เลิกงาน' };
 
@@ -206,39 +207,50 @@ $('file').onchange = function(){
   var img = new Image(); img.onload = function(){ crop(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(img.src); };
   img.src = URL.createObjectURL(f);
 };
-// ตัดตามกรอบ ไม่ย่อ (เว้นกว้างเกิน 1600) — เลขจะชัดสุด
+// ตัดตามกรอบ แล้วย่อกว้างไม่เกิน 1000px คุณภาพ 80% — เล็กลง 2–3 เท่า Vision ยังอ่านเลขได้ (ใช้รูปเดียวกันในการ์ด)
 function crop(src, W, H, r){   // r = พื้นที่กรอบบนภาพ (กล้องในแอป) · ไม่มี = กลางภาพ (กล้องเครื่อง)
   var cw = r ? r.w : W * FRAME.w, ch = r ? r.h : cw / FRAME.ratio, cx = r ? r.x : W * FRAME.x, cy = r ? r.y : (H - ch) / 2;
-  var ow = Math.min(1600, Math.round(cw)), oh = Math.round(ow / FRAME.ratio);
+  var ow = Math.min(1000, Math.round(cw)), oh = Math.round(ow / FRAME.ratio);
   var c = document.createElement('canvas'); c.width = ow; c.height = oh;
   c.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, ow, oh);
-  var data = c.toDataURL('image/jpeg', .88);
+  IMG = c.toDataURL('image/jpeg', .8);
   stopCam(); clearErr();
-  $('shot').src = data; $('reading').classList.remove('hide'); $('pick').classList.add('hide');
-  $('sesTxt').textContent = SES_TH[SES]; show('vConfirm');
-  READ = null;
-  api('mile.read', { image: data, session: SES }).then(function(r){ READ = r; showPick(); },
-    function(e){ err('อ่านรูปไม่สำเร็จ: ' + e.message); READ = { candidates: [], fileId: '', url: '' }; showPick(); });
+  $('shot').src = IMG; $('sesTxt').textContent = SES_TH[SES]; show('vConfirm');
+  // ช่องตัวเลขพร้อมทันที — DSR พิมพ์เองได้เลย ไม่ต้องรอ OCR; อ่านเสร็จค่อยเติมเลขให้ (ถ้ายังไม่ได้พิมพ์)
+  READ = { candidates: [], pending: true }; SHOT_T = Date.now();
+  $('num').value = ''; showPick();
+  var mine = SHOT_T;
+  api('mile.read', { image: IMG, session: SES }).then(function(r){
+    if (mine !== SHOT_T) return;   // ถ่ายใหม่ไปแล้ว
+    console.log('mile.read', Date.now() - mine, 'ms', r.ms);
+    READ = r; showPick();
+  }, function(e){
+    if (mine !== SHOT_T) return;
+    READ = { candidates: [], failed: true }; showPick();
+    console.log('mile.read fail', e.message);
+  });
 }
 function retake(){ clearErr(); show('vCam'); startCam(); }
 
 // ── เลือก/แก้เลข ─────────────────────────────────────────────
 function showPick(){
-  $('reading').classList.add('hide'); $('pick').classList.remove('hide');
-  var c = READ.candidates || [];
-  $('num').value = c.length ? c[0].mile : '';
-  $('pickHint').textContent = c.length ? 'เลขที่อ่านได้ — ถ้าไม่ตรง แตะตัวเลือกหรือพิมพ์แก้' : 'อ่านเลขไม่ออก — พิมพ์เลขไมล์ตามรูป';
-  $('chips').innerHTML = c.slice(0, 3).map(function(x, i){ return '<button class="chip' + (i === 0 ? ' on' : '') + '" data-m="' + x.mile + '">' + fmt(x.mile) + '</button>'; }).join('') +
+  var c = READ.candidates || [], typed = !!$('num').value && !READ._filled;
+  if (!typed && c.length) { $('num').value = c[0].mile; READ._filled = true; }
+  $('pickHint').innerHTML = READ.pending ? '<span class="dot"></span> กำลังอ่านเลขจากรูป… พิมพ์เองได้เลยไม่ต้องรอ'
+    : c.length ? 'เลขที่อ่านได้ — ถ้าไม่ตรง แตะตัวเลือกหรือพิมพ์แก้'
+    : READ.failed ? 'อ่านรูปไม่สำเร็จ — พิมพ์เลขไมล์ตามรูป' : 'อ่านเลขไม่ออก — พิมพ์เลขไมล์ตามรูป';
+  $('chips').innerHTML = READ.pending ? '' : c.slice(0, 3).map(function(x){
+      return '<button class="chip' + (String(x.mile) === $('num').value ? ' on' : '') + '" data-m="' + x.mile + '">' + fmt(x.mile) + '</button>'; }).join('') +
     '<button class="chip" data-m="">พิมพ์เอง</button>';
   [].forEach.call($('chips').children, function(b){ b.onclick = function(){
     [].forEach.call($('chips').children, function(x){ x.classList.remove('on'); }); b.classList.add('on');
     $('num').value = b.dataset.m; if (!b.dataset.m) $('num').focus(); checkWarn(); }; });
   var a = INIT.anchor;
   $('anchorTxt').textContent = a ? 'เลขล่าสุดที่ยืนยัน ' + fmt(a.mile) + ' (' + dTh(a.date) + ' ' + SES_TH[a.session] + ')' : '';
-  if (!c.length) $('num').focus();
+  if (!READ.pending && !c.length && !$('num').value) $('num').focus();
   checkWarn();
 }
-$('num').oninput = function(){ this.value = this.value.replace(/\D/g, '').slice(0, 7); checkWarn(); };
+$('num').oninput = function(){ this.value = this.value.replace(/\D/g, '').slice(0, 7); if (READ) READ._filled = false; checkWarn(); };
 function warnings(m){
   var w = [], a = INIT.anchor;
   if (!m) return w;
@@ -263,7 +275,7 @@ function save(ack){
   var w = warnings(m);
   if (w.length && !ack && !confirm('เลขนี้ผิดปกติ:\n• ' + w.join('\n• ') + '\n\nยืนยันว่าเลข ' + fmt(m) + ' ถูกต้อง?')) return;
   busy = true; $('bSave').disabled = true; $('bSave').textContent = 'กำลังบันทึก…';
-  api('mile.save', { session: SES, mile: m, fileId: READ.fileId, raw: top ? top.mile : '',
+  api('mile.save', { session: SES, mile: m, image: IMG, raw: top ? top.mile : '',
                      source: top && top.mile === m ? 'vision' : 'manual', ack: true })
     .then(function(r){ return sendCard(r, m).then(function(sent){ done(r, m, sent); }); })
     .catch(function(e){ err('บันทึกไม่สำเร็จ: ' + e.message); })
@@ -271,7 +283,7 @@ function save(ack){
 }
 function sendCard(r, m){
   var ctx = liff.getContext() || {};
-  if (!READ.url || ['group', 'room', 'utou'].indexOf(ctx.type) < 0) return Promise.resolve(false);
+  if (!r.url || ['group', 'room', 'utou'].indexOf(ctx.type) < 0) return Promise.resolve(false);
   var now = new Date(), hm = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
   var lines = [
     { type: 'text', text: '🚗 ' + INIT.name + ' · ' + SES_TH[SES] + ' ' + hm + ' น.', weight: 'bold', size: 'md', wrap: true },
@@ -280,7 +292,7 @@ function sendCard(r, m){
   if (r.warnings && r.warnings.length) lines.push({ type: 'text', text: '⚠️ ' + r.warnings.join(' · ') + ' (ยืนยันแล้ว)', size: 'xs', color: '#8A5A00', wrap: true });
   if (r.dryRun) lines.push({ type: 'text', text: 'ทดสอบระบบ — ไม่ได้บันทึกจริง', size: 'xs', color: '#8A8A8A' });
   return liff.sendMessages([{ type: 'flex', altText: '🚗 ' + INIT.name + ' ' + SES_TH[SES] + ' ' + fmt(m) + ' กม.', contents: { type: 'bubble',
-    hero: { type: 'image', url: READ.url, size: 'full', aspectRatio: '5:2', aspectMode: 'cover' },
+    hero: { type: 'image', url: r.url, size: 'full', aspectRatio: '5:2', aspectMode: 'cover' },
     body: { type: 'box', layout: 'vertical', spacing: 'xs', contents: lines } } }])
     .then(function(){ return true; }, function(){ return false; });
 }
